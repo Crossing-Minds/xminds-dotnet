@@ -32,12 +32,12 @@ namespace XMinds.Api
             }
         }
 
-        public async Task<TResponseModel> ParseResponseContentAsync<TResponseModel>(
-            HttpContent httpContent, CancellationToken cancellationToken)
+        public async Task<TResponseModel> ParseResponseAsync<TResponseModel>(
+            HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var responseJson = await httpContent.ReadAsStringAsync();
+            var responseJson = await httpResponseMessage.Content.ReadAsStringAsync();
             if (responseJson == null)
             {
                 // TODO: Review this.

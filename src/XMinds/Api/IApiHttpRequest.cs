@@ -12,7 +12,7 @@ namespace XMinds.Api
         void PrepareRequestHeadersAndBody(HttpRequestMessage httpRequestMessage, 
             Dictionary<string, object> bodyParams = null);
 
-        Task<TResponseModel> ParseResponseContentAsync<TResponseModel>(
-            HttpContent httpContent, CancellationToken cancellationToken);
+        Task<TResponseModel> ParseResponseAsync<TResponseModel>(
+            HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken);
     }
 }
