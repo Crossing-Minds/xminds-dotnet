@@ -8,8 +8,8 @@ namespace XMinds.Example
 {
     class Program
     {
-        const string RootAccountEmail = "your_root_email";
-        const string RootAccountPassword = "your_root_password";
+        const string XMindsApiRootEmail = "your_root_email";
+        const string XMindsApiRootPassword = "your_root_password";
 
         static void Main(string[] args)
         {
@@ -20,7 +20,9 @@ namespace XMinds.Example
         {
             var apiClient = new CrossingMindsApiClient();
 
-            await apiClient.LoginRootAsync(RootAccountEmail, RootAccountPassword);
+            var loginRootResult = await apiClient.LoginRootAsync(XMindsApiRootEmail, XMindsApiRootPassword);
+
+            var listAllAccountsResult = await apiClient.ListAllAccountsAsync();
 
             apiClient.Dispose();
         }

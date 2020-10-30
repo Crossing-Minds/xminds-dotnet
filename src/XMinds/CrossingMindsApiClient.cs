@@ -33,19 +33,21 @@ namespace XMinds
 
         #endregion
 
+        #region Login methods
+
         /// <summary>
         /// Logins with the root account, without selecting any database. 
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <param name="password">The password.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The JWT Token.</returns>
+        /// <returns>The result with JWT Token.</returns>
         /// <exception cref="ArgumentException">Email or password is not specified.</exception>
         /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD if the password is incorrect.</exception>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
-        public async Task<LoginRootToken> LoginRootAsync(string email, string password,
+        public async Task<LoginRootResult> LoginRootAsync(string email, string password,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(email))
@@ -58,7 +60,7 @@ namespace XMinds
                 throw new ArgumentException(nameof(password));
             }
 
-            var result = await this.SendRequestAsync<LoginRootToken>(HttpMethod.Post, "login/root/",
+            var result = await this.SendRequestAsync<LoginRootResult>(HttpMethod.Post, "login/root/",
                 bodyParams: new Dictionary<string, object>
                 {
                     { "email", email },
@@ -70,6 +72,30 @@ namespace XMinds
 
             return result;
         }
+
+        #endregion
+
+        #region Accounts API endpoints
+
+        /// <summary>
+        /// Gets all the accounts that belong to the organization of the token.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The JWT Token.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllAccountsResult> ListAllAccountsAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = await this.SendRequestAsync<ListAllAccountsResult>(HttpMethod.Get, "organizations/accounts/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        #endregion
 
         private async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
             Dictionary<string, object> bodyParams = null, 
