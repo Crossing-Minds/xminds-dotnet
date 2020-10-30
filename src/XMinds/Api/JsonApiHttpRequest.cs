@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -14,7 +14,6 @@ namespace XMinds.Api
         {
             // TODO: define User-Agent header.
             //'User-Agent': f'CrossingMinds/{__version__} (Python/{PYV}; JSON)',
-            { "Content-Type", "application/json" },
             { "Accept", "application/json" }
         };
 
@@ -29,7 +28,7 @@ namespace XMinds.Api
             if (bodyParams != null)
             {
                 var jsonBody = JsonConvert.SerializeObject(bodyParams);
-                httpRequestMessage.Content = new StringContent(jsonBody, Encoding.UTF8);
+                httpRequestMessage.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
             }
         }
 
@@ -38,11 +37,15 @@ namespace XMinds.Api
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            if (httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
+            {
+                return default(TResponseModel);
+            }
+
             var responseJson = await httpResponseMessage.Content.ReadAsStringAsync()
                 .ConfigureAwait(false); 
             if (responseJson == null)
             {
-                // TODO: Review this.
                 return default(TResponseModel);
             }
 

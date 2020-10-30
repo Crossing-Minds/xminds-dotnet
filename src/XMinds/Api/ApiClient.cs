@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,15 +17,30 @@ namespace XMinds.Api
 
         private readonly IApiHttpRequest apiHttpRequest;
 
+        /// <summary>
+        /// Gets or sets the timespan to wait before the request times out.
+        /// </summary>
+        public TimeSpan Timeout 
+        {
+            get => this.httpClient.Timeout;
+            set => this.httpClient.Timeout = value;
+        }
+
         public ApiClient(IApiHttpRequest apiHttpRequest)
         {
             this.apiHttpRequest = apiHttpRequest;
+
+            this.httpClient.BaseAddress = new Uri($"{ServerUrl}/{ ApiVersion}");
         }
+
+        #region IDisposable Implementation
 
         public void Dispose()
         {
             this.httpClient.Dispose();
         }
+
+        #endregion
 
         public void SetAuthJwtToken(string authJwtToken)
         {
@@ -39,24 +53,24 @@ namespace XMinds.Api
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var url = $"{ServerUrl}/{ApiVersion}/{path}";
-
-            var request = new HttpRequestMessage(httpMethod, url);
-
-            this.apiHttpRequest.PrepareRequestHeadersAndBody(request, bodyParams);
-
-            var responseMessage = await this.httpClient.SendAsync(request, cancellationToken)
-                .ConfigureAwait(false);
-
-            // TODO: Review this.
-            if (!responseMessage.IsSuccessStatusCode)
+            using (var request = new HttpRequestMessage(httpMethod, path))
             {
-                await this.ThrowRequestExceptionAsync(responseMessage, cancellationToken).ConfigureAwait(false);
-            }
+                this.apiHttpRequest.PrepareRequestHeadersAndBody(request, bodyParams);
 
-            return await this.apiHttpRequest.ParseResponseAsync<TResponseModel>(
-                responseMessage, cancellationToken)
-                .ConfigureAwait(false);
+                using (var responseMessage = await this.httpClient.SendAsync(request, cancellationToken)
+                    .ConfigureAwait(false))
+                {
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        await this.ThrowRequestExceptionAsync(responseMessage, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    return await this.apiHttpRequest.ParseResponseAsync<TResponseModel>(
+                        responseMessage, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+            }
         }
 
         private async Task ThrowRequestExceptionAsync(HttpResponseMessage httpResponseMessage, 
