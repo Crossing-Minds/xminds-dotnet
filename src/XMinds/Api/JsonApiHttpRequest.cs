@@ -12,6 +12,7 @@ namespace XMinds.Api
     {
         private static readonly Dictionary<string, string> headers = new Dictionary<string, string>()
         {
+            // TODO: define User-Agent header.
             //'User-Agent': f'CrossingMinds/{__version__} (Python/{PYV}; JSON)',
             { "Content-Type", "application/json" },
             { "Accept", "application/json" }
@@ -37,7 +38,8 @@ namespace XMinds.Api
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var responseJson = await httpResponseMessage.Content.ReadAsStringAsync();
+            var responseJson = await httpResponseMessage.Content.ReadAsStringAsync()
+                .ConfigureAwait(false); 
             if (responseJson == null)
             {
                 // TODO: Review this.

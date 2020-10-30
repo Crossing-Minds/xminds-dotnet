@@ -35,18 +35,20 @@ namespace XMinds
                 {
                     { "email", email },
                     { "password", password }
-                }, cancellationToken: cancellationToken);
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             this.apiClient.SetAuthJwtToken(result.Token);
 
             return result;
         }
 
-        private Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
+        private async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
             Dictionary<string, object> bodyParams = null, 
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, bodyParams, cancellationToken);
+            return await this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, bodyParams, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

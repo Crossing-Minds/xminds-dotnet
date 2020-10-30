@@ -14,6 +14,7 @@ namespace XMinds.Api
     sealed class ApiClient : IDisposable
     {
         private const string ServerUrl = "https://staging-api.crossingminds.com";
+        private const string ApiVersion = "v1";
 
         private readonly HttpClient httpClient = new HttpClient();
 
@@ -40,22 +41,24 @@ namespace XMinds.Api
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var url = $"{ServerUrl}/{path}";
+            var url = $"{ServerUrl}/{ApiVersion}/{path}";
 
             var request = new HttpRequestMessage(httpMethod, url);
 
             this.apiHttpRequest.PrepareRequestHeadersAndBody(request, bodyParams);
 
-            var responseMessage = await this.httpClient.SendAsync(request, cancellationToken);
+            var responseMessage = await this.httpClient.SendAsync(request, cancellationToken)
+                .ConfigureAwait(false);
 
             // TODO: Review this.
             if (!responseMessage.IsSuccessStatusCode)
             {
-                await this.ThrowRequestExceptionAsync(responseMessage, cancellationToken);
+                await this.ThrowRequestExceptionAsync(responseMessage, cancellationToken).ConfigureAwait(false);
             }
 
             return await this.apiHttpRequest.ParseResponseAsync<TResponseModel>(
-                responseMessage, cancellationToken);
+                responseMessage, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private async Task ThrowRequestExceptionAsync(HttpResponseMessage httpResponseMessage, 
@@ -64,7 +67,8 @@ namespace XMinds.Api
             cancellationToken.ThrowIfCancellationRequested();
 
             var apiError = await this.apiHttpRequest.ParseResponseAsync<ApiError>(
-                httpResponseMessage, cancellationToken);
+                httpResponseMessage, cancellationToken)
+                .ConfigureAwait(false); 
 
             var exception = CreateRequestException((int)httpResponseMessage.StatusCode, apiError);
 
