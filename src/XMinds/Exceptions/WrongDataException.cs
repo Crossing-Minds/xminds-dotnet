@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using XMinds.Models;
 
-namespace XMinds.Exceptions
+namespace XMinds
 {
     public class WrongDataException : XMindsErrorException
     {

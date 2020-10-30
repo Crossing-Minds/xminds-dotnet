@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace XMinds.Models
+namespace XMinds
 {
     public static class ErrorCode
     {
