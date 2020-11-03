@@ -24,6 +24,8 @@ namespace XMinds.Example
 
             var listAllAccountsResult = await apiClient.ListAllAccountsAsync();
 
+            //var loginResult = await apiClient.LoginIndividualAsync(XMindsApiRootEmail, XMindsApiRootPassword, );
+
             apiClient.Dispose();
         }
     }

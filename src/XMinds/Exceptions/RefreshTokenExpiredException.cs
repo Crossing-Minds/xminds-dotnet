@@ -5,9 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
-    public class RefreshTokenExpired : XMindsErrorException
+    public class RefreshTokenExpiredException : XMindsErrorException
     {
-        internal RefreshTokenExpired(ApiError apiError)
+        internal RefreshTokenExpiredException(ApiError apiError)
             : base((int) System.Net.HttpStatusCode.Unauthorized, apiError)
         {
         }

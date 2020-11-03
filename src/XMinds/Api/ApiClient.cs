@@ -118,7 +118,7 @@ namespace XMinds.Api
                 else if (httpStatusCode == (int)HttpStatusCode.Unauthorized 
                     && apiError?.ErrorCode == ErrorCode.RefreshTokenExpired)
                 {
-                    exception = new RefreshTokenExpired(apiError);
+                    exception = new RefreshTokenExpiredException(apiError);
                 }
                 else if (httpStatusCode == (int)HttpStatusCode.BadRequest
                     && apiError?.ErrorCode == ErrorCode.WrongData)

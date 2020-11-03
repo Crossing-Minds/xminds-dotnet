@@ -11,7 +11,7 @@ namespace XMinds
     public class LoginRootResult
     {
         /// <summary>
-        /// The JWT Token.
+        /// JWT Token.
         /// </summary>
         [JsonProperty("token")]
         public string Token { get; internal set; }
