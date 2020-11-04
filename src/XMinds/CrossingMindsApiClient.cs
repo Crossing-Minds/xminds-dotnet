@@ -86,6 +86,7 @@ namespace XMinds
         /// <param name="email">Email address.</param>
         /// <param name="password">Password.</param>
         /// <param name="dbId">Database ID.</param>
+        /// <param name="frontendUserId">Optional. Frontend user ID, for accounts with frontend role.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">Email, password, or dbId is not specified.</exception>
@@ -143,6 +144,7 @@ namespace XMinds
         /// <param name="name">Service name.</param>
         /// <param name="password">Password.</param>
         /// <param name="dbId">Database ID.</param>
+        /// <param name="frontendUserId">Optional. Frontend user ID, for accounts with frontend role.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">Email, password, or dbId is not specified.</exception>
@@ -411,15 +413,104 @@ namespace XMinds
                 .ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Sends a new verification code to the email address of an individual account. 
+        /// </summary>
+        /// <param name="email">Email address.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND 
+        /// if the email does not exist.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name ACCOUNT_ALREADY_VERIFIED 
+        /// if the email has already been verified.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task ResendVerificationCodeAsync(string email,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException(nameof(email));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, "accounts/resend-verification-code/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "email", email },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Verifies the email of an individual account. 
+        /// </summary>
+        /// <param name="email">Email address.</param>
+        /// <param name="code">Verification code.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND 
+        /// if the email does not exist.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name ACTIVATION_CODE_DOES_NOT_MATCH
+        /// if the code is incorret.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task VerifyAsync(string email, string code,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException(nameof(email));
+            }
+
+            if (string.IsNullOrEmpty(code))
+            {
+                throw new ArgumentException(nameof(code));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Get, "accounts/verify/",
+                queryParams: new Dictionary<string, object>
+                {
+                    { "code", code },
+                    { "email", email },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Deletes the account you’re logged to with your current token. 
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="InvalidOperationException">If no current account logged in.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteCurrentAccountAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!this.apiClient.IsAuthJwtTokenSet())
+            {
+                throw new InvalidOperationException(
+                    "No current account logged in. Execute one of login methods to set the current account.");
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete, "accounts/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         #endregion
 
         private async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
+            Dictionary<string, object> queryParams = null,
             Dictionary<string, object> bodyParams = null, 
             CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                return await this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, bodyParams, cancellationToken)
+                return await this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, queryParams, bodyParams, 
+                    cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (JwtTokenExpiredException)
@@ -432,7 +523,8 @@ namespace XMinds
                 await this.LoginRefreshTokenAsync(this.refreshToken, cancellationToken)
                     .ConfigureAwait(false);
 
-                return await this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, bodyParams, cancellationToken)
+                return await this.apiClient.SendRequestAsync<TResponseModel>(httpMethod, path, queryParams, bodyParams,
+                    cancellationToken)
                     .ConfigureAwait(false);
             }
         }

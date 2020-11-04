@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,16 +45,40 @@ namespace XMinds.Api
 
         public void SetAuthJwtToken(string authJwtToken)
         {
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authJwtToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = authJwtToken != null ?
+                new AuthenticationHeaderValue("Bearer", authJwtToken) : null;
+        }
+
+        public bool IsAuthJwtTokenSet()
+        {
+            return this.httpClient.DefaultRequestHeaders.Authorization != null;
         }
 
         public async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
+             Dictionary<string, object> queryParams = null,
             Dictionary<string, object> bodyParams = null, 
             CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using (var request = new HttpRequestMessage(httpMethod, path))
+            var query = path;
+            if (queryParams != null)
+            {
+                var queryParamsBuilder = new StringBuilder(1000);
+                foreach(var queryParam in queryParams)
+                {
+                    if (queryParamsBuilder.Length != 0)
+                    {
+                        queryParamsBuilder.Append("&");
+                    }
+
+                    queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(queryParam.Value.ToString())}");
+                }
+
+                query = $"{path}?{queryParamsBuilder.ToString()}";
+            }
+
+            using (var request = new HttpRequestMessage(httpMethod, query))
             {
                 this.apiHttpRequest.PrepareRequestHeadersAndBody(request, bodyParams);
 

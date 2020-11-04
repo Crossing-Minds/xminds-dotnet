@@ -34,6 +34,19 @@ namespace XMinds.Example
                 XMindsApiIndividualAccountEmail, XMindsApiIndividualAccountPassword, 
                 Role.Manager, "John", "Doe");
 
+            await apiClient.ResendVerificationCodeAsync(XMindsApiIndividualAccountEmail);
+
+            try
+            {
+                await apiClient.VerifyAsync(XMindsApiIndividualAccountEmail, 
+                    // Invalid verification code.
+                    "00000000");
+            }
+            catch (AuthErrorException)
+            {
+                // This is expected as we provided invalid verification code.
+            }
+
             await apiClient.DeleteIndividualAccountAsync(XMindsApiIndividualAccountEmail);
 
             var createdServiceAccount = await apiClient.CreateServiceAccountAsync(
@@ -41,6 +54,8 @@ namespace XMinds.Example
                 Role.Manager);
 
             await apiClient.DeleteServiceAccountAsync(XMindsApiServiceAccountName);
+
+            //await apiClient.DeleteCurrentAccountAsync();
 
             apiClient.Dispose();
         }
