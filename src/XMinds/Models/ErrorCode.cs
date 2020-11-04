@@ -4,6 +4,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// The reported error codes.
+    /// </summary>
     public static class ErrorCode
     {
         public const int ServerError = 0;

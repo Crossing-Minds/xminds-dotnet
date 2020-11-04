@@ -47,7 +47,8 @@ namespace XMinds
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result with JWT Token.</returns>
         /// <exception cref="ArgumentException">Email or password is not specified.</exception>
-        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD if the password is incorrect.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD 
+        /// if the password is incorrect.</exception>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -88,8 +89,10 @@ namespace XMinds
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">Email, password, or dbId is not specified.</exception>
-        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD if the password is incorrect.</exception>
-        /// <exception cref="AuthErrorException">AuthError with error name ACCOUNT_NOT_VERIFIED if the email has not been verified.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD 
+        /// if the password is incorrect.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name ACCOUNT_NOT_VERIFIED 
+        /// if the email has not been verified.</exception>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -143,7 +146,8 @@ namespace XMinds
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">Email, password, or dbId is not specified.</exception>
-        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD if the password is incorrect.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_PASSWORD 
+        /// if the password is incorrect.</exception>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -197,9 +201,12 @@ namespace XMinds
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">The refresh token is not specified.</exception>
-        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND if the account has been deleted.</exception>
-        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_REFRESH_TOKEN if the refresh token is invalid.</exception>
-        /// <exception cref="RefreshTokenExpiredException">RefreshTokenExpired with error name REFRESH_TOKEN_EXPIRED if the refresh token is expired.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND 
+        /// if the account has been deleted.</exception>
+        /// <exception cref="AuthErrorException">AuthError with error name INCORRECT_REFRESH_TOKEN 
+        /// if the refresh token is invalid.</exception>
+        /// <exception cref="RefreshTokenExpiredException">RefreshTokenExpired with error name REFRESH_TOKEN_EXPIRED
+        /// if the refresh token is expired.</exception>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -246,6 +253,162 @@ namespace XMinds
                 .ConfigureAwait(false);
 
             return result;
+        }
+
+        /// <summary>
+        /// Сreates a new account for an individual, identified by an email. 
+        /// </summary>
+        /// <param name="email">Email address.</param>
+        /// <param name="password">Password.</param>
+        /// <param name="role">Role, choices: [manager, backend, frontend].</param>
+        /// <param name="firstName">First name.</param>
+        /// <param name="lastName">Last name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created account information.</returns>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_ACCOUNT
+        /// if an individual account with the same email already exists.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<CreatedAccount> CreateIndividualAccountAsync(string email, string password, string role,
+            string firstName, string lastName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException(nameof(email));
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException(nameof(password));
+            }
+
+            if (string.IsNullOrEmpty(role))
+            {
+                throw new ArgumentException(nameof(role));
+            }
+
+            if (string.IsNullOrEmpty(firstName))
+            {
+                throw new ArgumentException(nameof(firstName));
+            }
+
+            if (string.IsNullOrEmpty(lastName))
+            {
+                throw new ArgumentException(nameof(lastName));
+            }
+
+            var result = await this.SendRequestAsync<CreatedAccount>(HttpMethod.Post, "accounts/individual/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "email", email },
+                    { "password", password },
+                    { "role", role },
+                    { "first_name", firstName },
+                    { "last_name", lastName },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Deletes another individual account by email address that belong to the organization of the token. 
+        /// </summary>
+        /// <param name="email">Email address.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND 
+        /// if the account does not exist.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteIndividualAccountAsync(string email,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException(nameof(email));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete, "accounts/individual/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "email", email },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Сreates a new service account, identified by a service name. 
+        /// </summary>
+        /// <param name="name">Service name.</param>
+        /// <param name="password">Password.</param>
+        /// <param name="role">Role, choices: [manager, backend, frontend].</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The created account information.</returns>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_ACCOUNT
+        /// if a service account with the same name already exists.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<CreatedAccount> CreateServiceAccountAsync(string name, string password, string role,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException(nameof(name));
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException(nameof(password));
+            }
+
+            if (string.IsNullOrEmpty(role))
+            {
+                throw new ArgumentException(nameof(role));
+            }
+
+            var result = await this.SendRequestAsync<CreatedAccount>(HttpMethod.Post, "accounts/service/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "name", name },
+                    { "password", password },
+                    { "role", role },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Deletes another individual account by email address that belong to the organization of the token. 
+        /// </summary>
+        /// <param name="name">Service name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ACCOUNT_NOT_FOUND 
+        /// if the account does not exist.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteServiceAccountAsync(string name,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException(nameof(name));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete, "accounts/service/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "name", name },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
 
         #endregion
