@@ -250,7 +250,7 @@ namespace XMinds
         public async Task<ListAllAccountsResult> ListAllAccountsAsync(
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await this.SendRequestAsync<ListAllAccountsResult>(HttpMethod.Get, "organizations/accounts/",
+            var result = await this.SendRequestAsync<ListAllAccountsResult>(HttpMethod.Get, "organizations/current/accounts/",
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
