@@ -26,9 +26,7 @@ namespace XMinds.Example
         {
             var apiClient = new CrossingMindsApiClient();
 
-            var loginRootResult = await apiClient.LoginRootAsync(XMindsApiRootEmail, XMindsApiRootPassword);
-
-            var listAllAccountsResult = await apiClient.ListAllAccountsAsync();
+            await apiClient.LoginRootAsync(XMindsApiRootEmail, XMindsApiRootPassword);
 
             var createdIndividualAccount = await apiClient.CreateIndividualAccountAsync(
                 XMindsApiIndividualAccountEmail, XMindsApiIndividualAccountPassword, 
@@ -47,11 +45,32 @@ namespace XMinds.Example
                 // This is expected as we provided invalid verification code.
             }
 
-            await apiClient.DeleteIndividualAccountAsync(XMindsApiIndividualAccountEmail);
-
             var createdServiceAccount = await apiClient.CreateServiceAccountAsync(
                 XMindsApiServiceAccountName, XMindsApiServiceAccountPassword,
                 Role.Manager);
+
+            var listAllAccountsResult = await apiClient.ListAllAccountsAsync();
+
+            var createdDatabase = await apiClient.CreateDatabaseAsync(
+                "ExampleDatabase", "Example Database created by .NET SDK Example",
+                "uuid", "uint32");
+
+            await apiClient.LoginServiceAsync(
+                XMindsApiServiceAccountName, XMindsApiServiceAccountPassword, createdDatabase.Id);
+
+
+            var allDatabases = await apiClient.ListAllDatabasesAsync(1, 10);
+
+            var currentDatabase = await apiClient.GetCurrentDatabaseAsync();
+
+            var currentDatabaseStatus = await apiClient.GetCurrentDatabaseStatusAsync();
+
+            await apiClient.DeleteCurrentDatabaseAsync();
+
+
+            await apiClient.LoginRootAsync(XMindsApiRootEmail, XMindsApiRootPassword);
+
+            await apiClient.DeleteIndividualAccountAsync(XMindsApiIndividualAccountEmail);
 
             await apiClient.DeleteServiceAccountAsync(XMindsApiServiceAccountName);
 
