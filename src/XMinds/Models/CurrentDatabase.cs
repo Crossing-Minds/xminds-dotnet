@@ -50,7 +50,7 @@ namespace XMinds
         /// Extra meta data, as unvalidated JSON.
         /// </summary>
         [JsonProperty("metadata")]
-        public dynamic Metadata { get; internal set; }
+        public IReadOnlyDictionary<string, object> Metadata { get; internal set; }
 
     }
 }

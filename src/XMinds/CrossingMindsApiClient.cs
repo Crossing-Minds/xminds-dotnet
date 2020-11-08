@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -653,7 +654,7 @@ namespace XMinds
         }
 
         /// <summary>
-        /// Get status of database. Initially the database will be in “pending” status. Until the status
+        /// Gets status of database. Initially the database will be in “pending” status. Until the status
         /// switch to “ready” you will not be able to get recommendations.
         /// Endpoint: GET databases/current/status/
         /// </summary>
@@ -672,7 +673,274 @@ namespace XMinds
             return result;
         }
 
-        #endregion 
+        #endregion
+
+        #region Users Data and Properties
+
+        /// <summary>
+        /// Gets all user-properties for the current database.
+        /// Endpoint: GET databases/
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The user-properties list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllUserPropertiesResult> ListAllUserPropertiesAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = await this.SendRequestAsync<ListAllUserPropertiesResult>(HttpMethod.Get, "users-properties/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new user-property, identified by property_name (case-insensitive).
+        /// Endpoint: POST users-properties/
+        /// </summary>
+        /// <param name="propertyName">Property name, [max-length: 64]. Only alphanumeric characters, dots, underscores 
+        /// or hyphens are allowed. The names ‘item_id’ and ‘user_id’ are reserved.</param>
+        /// <param name="valueType">Property type, [max-length: 10]. 
+        /// See https://docs.api.crossingminds.com/properties.html#concept-properties-types</param>
+        /// <param name="repeated">Optional. Whether the property has many values.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_USER_PROPERTY
+        /// if a user property with the same name already exists.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if value_type is invalid.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task CreateUserPropertyAsync(string propertyName, 
+            string valueType, bool repeated = false,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            if (string.IsNullOrEmpty(valueType))
+            {
+                throw new ArgumentException(nameof(valueType));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Post, "users-properties/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "property_name", propertyName },
+                    { "value_type", valueType },
+                    { "repeated", repeated },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets one user-property given its property name.
+        /// Endpoint: GET users-properties/{str:property_name}/
+        /// </summary>
+        /// <param name="propertyName">Property name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The user-property data.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<Property> GetUserPropertyAsync(string propertyName,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            var result = await this.SendRequestAsync<Property>(HttpMethod.Get, 
+                $"users-properties/{Uri.EscapeDataString(propertyName)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Deletes an user-property given by its name.
+        /// Endpoint: DELETE users-properties/{str:property_name}/
+        /// </summary>
+        /// <param name="propertyName">Property name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name USER_PROPERTY_NOT_FOUND
+        /// if the property name cannot be found.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteUserPropertyAsync(string propertyName,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete, 
+                $"users-properties/{Uri.EscapeDataString(propertyName)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets one user given its ID.
+        /// Endpoint: GET users/{str:user_id}/
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The user data.</returns>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name USER_NOT_FOUND
+        /// if no user with the given user id can be found.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<GetUserResult> GetUserAsync(object userId,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
+            var result = await this.SendRequestAsync<GetUserResult>(HttpMethod.Get,
+                $"users/{this.UserIdToUrlParam(userId)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new user, or update it if the user id already exists. All properties need to be defined beforehand.
+        /// Endpoint: PUT users/{str:user_id}/
+        /// </summary>
+        /// <param name="userId">User id. Note that user id cannot be a “null” or “falsy” value, such as empty string
+        /// or 0.</param>
+        /// <param name="user">User data. The dictionary key is property name, dictionary value is property value.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if the properties are invalid.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task CreateOrUpdateUserAsync(object userId, IDictionary<string, object> user,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
+            if (user == null)
+            {
+                throw new ArgumentException(nameof(user));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, 
+                $"users/{this.UserIdToUrlParam(userId)}/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "user", user },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Creates many users in bulk, or update the ones for which the user_id already exist. 
+        /// All properties need to be defined beforehand. The users data are sent to the server in chunks.
+        /// Endpoint: PUT users-bulk/
+        /// </summary>
+        /// <param name="users">Users data. Each item in List is a user data represented by Dictionary. The 
+        /// dictionary key is property name, dictionary value is property value. Each dictorinary should contain 
+        /// at least one "user_id" property, and can be extended with other properties. Note that user id cannot be 
+        /// a “null” or “falsy” value, such as empty string or 0.</param>
+        /// <param name="chunkSize">Optional. The chunk size (the number of users included in the chunk), users data
+        /// are sent to the server in chunks of this size (default: 1K).</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if the properties are invalid.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_USER_ID 
+        /// if a user_id occurs multiple times in the same request</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
+        /// Exception.Data dictionary. The item is the index of last successfuly sent user from the list. 
+        /// The client can use the index to repeat the request starting from "last_processed_index" + 1 user. </remarks>
+        public async Task CreateOrUpdateUsersBulkAsync(List<IDictionary<string, object>> users, int chunkSize = 1024,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var chunkIndex = 0;
+
+            try
+            {
+                if (users == null)
+                {
+                    throw new ArgumentException(nameof(users));
+                }
+
+                while (chunkIndex < users.Count)
+                {
+                    var actualChunkSize = Math.Min(chunkSize, users.Count - chunkIndex);
+                    var usersChunk = new List<IDictionary<string, object>>(actualChunkSize);
+                    for (var i = chunkIndex; i < chunkIndex + actualChunkSize; ++i)
+                    {
+                        usersChunk.Add(users[i]);
+                    }
+
+                    await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, $"users-bulk/",
+                        bodyParams: new Dictionary<string, object>
+                        {
+                            { "users", usersChunk },
+                        }, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+
+                    chunkIndex += actualChunkSize;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Adding the index of the last successfuly sent user from the list.
+                // The client can use the index to repeat the request starting from index + 1 user.
+                ex.Data.Add("last_processed_index", chunkIndex - 1);
+
+                throw;
+            }
+        }
+
+        /*
+        /// <summary>
+        /// Gets all user-properties for the current database.
+        /// Endpoint: GET users-bulk/
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The user-properties list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllUserPropertiesResult> ListAllUserPropertiesAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = await this.SendRequestAsync<ListAllUserPropertiesResult>(HttpMethod.Get, "users-bulk/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        } 
+        */
+        
+        #endregion
 
         #region General code 
 
@@ -701,6 +969,13 @@ namespace XMinds
                     cancellationToken)
                     .ConfigureAwait(false);
             }
+        }
+
+        private string UserIdToUrlParam(object userId)
+        {
+            var userIdString = Convert.ToString(userId, CultureInfo.InvariantCulture);
+
+            return Uri.EscapeDataString(userIdString);
         }
 
         #endregion
