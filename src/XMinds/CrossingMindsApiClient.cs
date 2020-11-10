@@ -17,8 +17,8 @@ namespace XMinds
         private ApiClient apiClient = new ApiClient(new JsonApiHttpRequest());
 
         private string refreshToken = null;
-
         private Database database = null;
+        private string loginName = null;
 
         /// <summary>
         /// Gets or sets the timespan to wait before the request times out.
@@ -78,6 +78,7 @@ namespace XMinds
             this.apiClient.SetAuthJwtToken(result.Token);
             this.refreshToken = null;
             this.database = null;
+            this.loginName = email;
 
             return result;
         }
@@ -137,6 +138,7 @@ namespace XMinds
             this.apiClient.SetAuthJwtToken(result.Token);
             this.refreshToken = result.RefreshToken;
             this.database = result.Database;
+            this.loginName = email;
 
             return result;
         }
@@ -194,6 +196,7 @@ namespace XMinds
             this.apiClient.SetAuthJwtToken(result.Token);
             this.refreshToken = result.RefreshToken;
             this.database = result.Database;
+            this.loginName = name;
 
             return result;
         }
@@ -236,6 +239,7 @@ namespace XMinds
             this.apiClient.SetAuthJwtToken(result.Token);
             this.refreshToken = result.RefreshToken;
             this.database = result.Database;
+            this.loginName = null;
 
             return result;
         }
@@ -348,6 +352,11 @@ namespace XMinds
                     { "email", email },
                 }, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
+
+            if (email.Equals(this.loginName, StringComparison.OrdinalIgnoreCase))
+            {
+                this.ResetLoginData();
+            }    
         }
 
         /// <summary>
@@ -421,6 +430,11 @@ namespace XMinds
                     { "name", name },
                 }, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
+
+            if (name.Equals(this.loginName, StringComparison.OrdinalIgnoreCase))
+            {
+                this.ResetLoginData();
+            }
         }
 
         /// <summary>
@@ -512,9 +526,7 @@ namespace XMinds
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            this.apiClient.SetAuthJwtToken(null);
-            this.refreshToken = null;
-            this.database = null;
+            this.ResetLoginData();
         }
 
         #endregion
@@ -650,7 +662,7 @@ namespace XMinds
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            this.database = null;
+            this.ResetLoginData();
         }
 
         /// <summary>
@@ -1023,6 +1035,14 @@ namespace XMinds
             var userIdString = Convert.ToString(userId, CultureInfo.InvariantCulture);
 
             return Uri.EscapeDataString(userIdString);
+        }
+
+        private void ResetLoginData()
+        {
+            this.apiClient.SetAuthJwtToken(null);
+            this.refreshToken = null;
+            this.database = null;
+            this.loginName = null;
         }
 
         #endregion

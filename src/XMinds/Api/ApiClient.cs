@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace XMinds.Api
 {
@@ -13,6 +14,8 @@ namespace XMinds.Api
     {
         private const string ServerUrl = "https://staging-api.crossingminds.com";
         private const string ApiVersion = "v1";
+
+        private const int DefaultHttpRequestTimeout = 30; // in seconds.
 
         private readonly HttpClient httpClient = new HttpClient();
 
@@ -31,7 +34,10 @@ namespace XMinds.Api
         {
             this.apiHttpRequest = apiHttpRequest;
 
+            this.httpClient.Timeout = TimeSpan.FromSeconds(DefaultHttpRequestTimeout);
             this.httpClient.BaseAddress = new Uri($"{ServerUrl}/{ ApiVersion}");
+            this.httpClient.DefaultRequestHeaders.Add("User-Agent", 
+                $"CrossingMinds/{typeof(ApiClient).GetTypeInfo().Assembly.GetName().Version} (C#; JSON)");
         }
 
         #region IDisposable Implementation
