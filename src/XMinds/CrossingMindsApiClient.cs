@@ -691,7 +691,7 @@ namespace XMinds
 
         /// <summary>
         /// Gets all user-properties for the current database.
-        /// Endpoint: GET databases/
+        /// Endpoint: GET users-properties/
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user-properties list.</returns>
@@ -757,7 +757,9 @@ namespace XMinds
         /// <param name="propertyName">Property name.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user-property data.</returns>
-        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name USER_PROPERTY_NOT_FOUND
+        /// if the property name cannot be found.</exception>
+        /// /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<Property> GetUserPropertyAsync(string propertyName,
@@ -997,8 +999,129 @@ namespace XMinds
                 .ConfigureAwait(false);
 
             return result;
-        } 
-        
+        }
+
+        #endregion
+
+        #region Items Data and Properties
+
+        /// <summary>
+        /// Getы all item-properties for the current database.
+        /// Endpoint: GET items-properties/
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The item-properties list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllItemPropertiesResult> ListAllItemPropertiesAsync(
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var result = await this.SendRequestAsync<ListAllItemPropertiesResult>(HttpMethod.Get, "items-properties/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new item-property, identified by property_name (case-insensitive).
+        /// Endpoint: POST items-properties/
+        /// </summary>
+        /// <param name="propertyName">Property name, [max-length: 64]. Only alphanumeric characters, dots, underscores 
+        /// or hyphens are allowed. The names ‘item_id’ and ‘user_id’ are reserved.</param>
+        /// <param name="valueType">Property type, [max-length: 10]. 
+        /// See https://docs.api.crossingminds.com/properties.html#concept-properties-types</param>
+        /// <param name="repeated">Optional. Whether the property has many values.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_ITEM_PROPERTY
+        /// if an item property with the same name already exists.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE
+        /// if value_type is invalid.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task CreateItemPropertyAsync(string propertyName,
+            string valueType, bool repeated = false,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            if (string.IsNullOrEmpty(valueType))
+            {
+                throw new ArgumentException(nameof(valueType));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Post, "items-properties/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "property_name", propertyName },
+                    { "value_type", valueType },
+                    { "repeated", repeated },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets one item-property given its property name.
+        /// Endpoint: GET items-properties/{str:property_name}/
+        /// </summary>
+        /// <param name="propertyName">Property name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The item-property data.</returns>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ITEM_PROPERTY_NOT_FOUND
+        /// if the property name cannot be found.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<Property> GetItemPropertyAsync(string propertyName,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            var result = await this.SendRequestAsync<Property>(HttpMethod.Get,
+                $"items-properties/{Uri.EscapeDataString(propertyName)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Deletes an item-property given by its name.
+        /// Endpoint: DELETE items-properties/{str:property_name}/
+        /// </summary>
+        /// <param name="propertyName">Property name.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ITEM_PROPERTY_NOT_FOUND
+        /// if the property name cannot be found.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeletItemPropertyAsync(string propertyName,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException(nameof(propertyName));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete,
+                $"items-properties/{Uri.EscapeDataString(propertyName)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+
+
         #endregion
 
         #region General code 
