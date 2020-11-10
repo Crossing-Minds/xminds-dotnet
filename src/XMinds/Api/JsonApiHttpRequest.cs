@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XMinds.Utils;
 
 namespace XMinds.Api
 {
@@ -51,7 +52,7 @@ namespace XMinds.Api
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            return JsonConvert.DeserializeObject<TResponseModel>(responseJson);
+            return JsonConvert.DeserializeObject<TResponseModel>(responseJson, new UntypedJsonConverter());
         }
     }
 }

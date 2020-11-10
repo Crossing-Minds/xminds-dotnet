@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The current database data.
     /// </summary>
-    public class CurrentDatabase
+    public sealed class CurrentDatabase
     {
         /// <summary>
         /// Database ID.

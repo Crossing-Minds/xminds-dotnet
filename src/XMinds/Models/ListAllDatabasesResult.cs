@@ -6,9 +6,9 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of List All Databases API endpoint.
+    /// The result of ListAllDatabasesAsync method.
     /// </summary>
-    public class ListAllDatabasesResult
+    public sealed class ListAllDatabasesResult
     {
         /// <summary>
         /// Indicates whether or not there are more pages to request.
@@ -26,6 +26,6 @@ namespace XMinds
         /// Databases page.
         /// </summary>
         [JsonProperty("databases")]
-        public IReadOnlyCollection<Database> Databases { get; internal set; }
+        public IReadOnlyList<Database> Databases { get; internal set; }
     }
 }

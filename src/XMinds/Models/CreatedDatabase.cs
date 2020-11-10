@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The created database data.
     /// </summary>
-    public class CreatedDatabase
+    public sealed class CreatedDatabase
     {
         /// <summary>
         /// Database ID

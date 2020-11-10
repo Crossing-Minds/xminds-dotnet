@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The individual account data.
     /// </summary>
-    public class IndividualAccount
+    public sealed class IndividualAccount
     {
         /// <summary>
         /// The First Name.

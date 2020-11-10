@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XMinds
 {
-    class ApiError
+    sealed class ApiError
     {
         [JsonProperty("error_code")]
         public int? ErrorCode { get; set; }

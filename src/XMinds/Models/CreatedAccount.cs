@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The created account data.
     /// </summary>
-    public class CreatedAccount
+    public sealed class CreatedAccount
     {
         /// <summary>
         /// Account ID

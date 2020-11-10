@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The current database counters.
     /// </summary>
-    public class DatabaseCounters
+    public sealed class DatabaseCounters
     {
         /// <summary>
         /// Amount of ratings.

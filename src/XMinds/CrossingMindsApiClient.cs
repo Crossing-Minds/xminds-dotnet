@@ -833,24 +833,28 @@ namespace XMinds
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
-        public async Task CreateOrUpdateUserAsync(object userId, IDictionary<string, object> user,
+        public async Task CreateOrUpdateUserAsync(User user,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (userId == null)
-            {
-                throw new ArgumentException(nameof(userId));
-            }
-
             if (user == null)
             {
                 throw new ArgumentException(nameof(user));
             }
 
+            if (user.UserId == null)
+            {
+                throw new ArgumentException($"{User.UserIdPropName} property");
+            }
+
+            // Removes user_id as API endpoint accepts user id in url.
+            var userProps = new Dictionary<string, object>(user);
+            userProps.Remove(User.UserIdPropName);
+
             await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, 
-                $"users/{this.UserIdToUrlParam(userId)}/",
+                $"users/{this.UserIdToUrlParam(user.UserId)}/",
                 bodyParams: new Dictionary<string, object>
                 {
-                    { "user", user },
+                    { "user", userProps },
                 }, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -860,10 +864,7 @@ namespace XMinds
         /// All properties need to be defined beforehand. The users data are sent to the server in chunks.
         /// Endpoint: PUT users-bulk/
         /// </summary>
-        /// <param name="users">Users data. Each item in List is a user data represented by Dictionary. The 
-        /// dictionary key is property name, dictionary value is property value. Each dictorinary should contain 
-        /// at least one "user_id" property, and can be extended with other properties. Note that user id cannot be 
-        /// a “null” or “falsy” value, such as empty string or 0.</param>
+        /// <param name="users">Users data. For each user object at least "user_id" property should be specified.</param>
         /// <param name="chunkSize">Optional. The chunk size (the number of users included in the chunk), users data
         /// are sent to the server in chunks of this size (default: 1K).</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -878,7 +879,7 @@ namespace XMinds
         /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
         /// Exception.Data dictionary. The item is the index of last successfuly sent user from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 user. </remarks>
-        public async Task CreateOrUpdateUsersBulkAsync(List<IDictionary<string, object>> users, int chunkSize = 1024,
+        public async Task CreateOrUpdateUsersBulkAsync(List<User> users, int chunkSize = 1024,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var chunkIndex = 0;
@@ -919,26 +920,72 @@ namespace XMinds
             }
         }
 
-        /*
         /// <summary>
-        /// Gets all user-properties for the current database.
+        /// Gets multiple users by page. The response is paginated, you can control the response amount and offset 
+        /// using the query parameters amt and cursor.
         /// Endpoint: GET users-bulk/
+        /// </summary>
+        /// <param name="amt">Optional. [max: 500] Maximum amount of users returned, by default is 300.</param>
+        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The database list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllUsersBulkResult> ListAllUsersBulkAsync(int? amt = null, string cursor = null, 
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Dictionary<string, object> queryParams = null;
+            if (amt != null || cursor != null)
+            {
+                queryParams = new Dictionary<string, object>();
+                if (amt != null)
+                {
+                    queryParams.Add("amt", amt);
+                }
+
+                if (cursor != null)
+                {
+                    queryParams.Add("cursor", cursor);
+                }
+            }
+
+            var result = await this.SendRequestAsync<ListAllUsersBulkResult>(HttpMethod.Get, "users-bulk/",
+                queryParams: queryParams, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+
+        /// <summary>
+        /// Get multiple users given their IDs. The users in the response are not aligned with the input, 
+        /// the missing users are simply not present in the result.
+        /// Endpoint: POST users-bulk/list/
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user-properties list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
-        public async Task<ListAllUserPropertiesResult> ListAllUserPropertiesAsync(
+        public async Task<ListUsersByIdsResult> ListUsersByIdsAsync(List<object> usersIds,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await this.SendRequestAsync<ListAllUserPropertiesResult>(HttpMethod.Get, "users-bulk/",
+            if (usersIds == null)
+            {
+                throw new ArgumentException(nameof(usersIds));
+            }
+
+            var result = await this.SendRequestAsync<ListUsersByIdsResult>(HttpMethod.Post, "users-bulk/list/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "users_id", usersIds },
+                },
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             return result;
         } 
-        */
         
         #endregion
 

@@ -13,8 +13,19 @@ namespace XMinds
         public string ErrorName { get; private set; }
         public int? RetryAfter { get; private set; }
 
-        // TODO: Review this.
-        public System.Collections.IDictionary ErrorData => this.Data;
+        public IDictionary<object, object> ErrorData
+        {
+            get
+            {
+                var dict = new Dictionary<object, object>(this.Data.Count);
+                foreach(System.Collections.DictionaryEntry dictionaryEntry in this.Data)
+                {
+                    dict.Add(dictionaryEntry.Key, dictionaryEntry.Value);
+                }
+
+                return dict;
+            }
+        }
 
         internal XMindsErrorException(int httpStatusCode, ApiError apiError)
             : base(apiError?.Message)
@@ -27,7 +38,7 @@ namespace XMinds
             {
                 foreach(var dataItem in apiError?.ErrorData)
                 {
-                    this.Data.Add(dataItem.Key, dataItem.Value);
+                    this.Data.Add(dataItem.Key, dataItem.Value?.ToString());
                 }
 
                 object retryAfter = null;

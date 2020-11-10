@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The database object.
     /// </summary>
-    public class Database
+    public sealed class Database
     {
         /// <summary>
         /// Database ID.

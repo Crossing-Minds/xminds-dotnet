@@ -7,7 +7,7 @@ namespace XMinds
     /// <summary>
     /// Internal helper that represents empty result (without data).
     /// </summary>
-    class VoidEntity
+    sealed class VoidEntity
     {
     }
 }

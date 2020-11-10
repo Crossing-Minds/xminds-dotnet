@@ -6,21 +6,21 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of List All Accounts API endpoint.
+    /// The result of ListAllAccountsAsync method.
     /// </summary>
-    public class ListAllAccountsResult
+    public sealed class ListAllAccountsResult
     {
         /// <summary>
         /// The individual accounts.
         /// </summary>
         [JsonProperty("individual_accounts")]
-        public IReadOnlyCollection<IndividualAccount> IndividualAccounts { get; internal set; }
+        public IReadOnlyList<IndividualAccount> IndividualAccounts { get; internal set; }
 
         /// <summary>
         /// The service accounts.
         /// </summary>
         [JsonProperty("service_accounts")]
-        public IReadOnlyCollection<ServiceAccount> ServiceAccounts { get; internal set; }
+        public IReadOnlyList<ServiceAccount> ServiceAccounts { get; internal set; }
 
     }
 }

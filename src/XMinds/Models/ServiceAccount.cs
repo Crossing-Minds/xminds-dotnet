@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The service account data.
     /// </summary>
-    public class ServiceAccount
+    public sealed class ServiceAccount
     {
         /// <summary>
         /// The Service Name.

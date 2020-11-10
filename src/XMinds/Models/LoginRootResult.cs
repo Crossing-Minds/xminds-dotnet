@@ -6,9 +6,9 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of Login as Root API endpoint.
+    /// The result of LoginRootAsync method.
     /// </summary>
-    public class LoginRootResult
+    public sealed class LoginRootResult
     {
         /// <summary>
         /// JWT Token.

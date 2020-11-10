@@ -8,7 +8,7 @@ namespace XMinds
     /// <summary>
     /// The property object.
     /// </summary>
-    public class Property
+    public sealed class Property
     {
         /// <summary>
         /// Property name [max-length: 64]. Only alphanumeric characters, dots, underscores or hyphens are allowed.

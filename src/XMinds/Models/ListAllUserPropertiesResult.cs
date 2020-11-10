@@ -6,14 +6,14 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of List All User-Properties API endpoint.
+    /// The result of ListAllUserPropertiesAsync method.
     /// </summary>
-    public class ListAllUserPropertiesResult
+    public sealed class ListAllUserPropertiesResult
     {
         /// <summary>
         /// All properties.
         /// </summary>
         [JsonProperty("properties")]
-        public IReadOnlyCollection<Property> Properties { get; internal set; }
+        public IReadOnlyList<Property> Properties { get; internal set; }
     }
 }

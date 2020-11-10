@@ -6,9 +6,9 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of Login as Individual, Login as Service and Login with Refresh Token API endpoint.
+    /// The result of LoginIndividualAsync, LoginServiceAsync and LoginRefreshTokenAsync methods.
     /// </summary>
-    public class LoginResult
+    public sealed class LoginResult
     {
         /// <summary>
         /// The JWT Token.

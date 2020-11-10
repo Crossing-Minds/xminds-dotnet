@@ -7,14 +7,14 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The response of Get User API endpoint.
+    /// The result of GetUserAsync method.
     /// </summary>
-    public class GetUserResult
+    public sealed class GetUserResult
     {
         /// <summary>
         /// The user data. The dictionary key is property name, dictionary value is property value.
         /// </summary>
         [JsonProperty("user")]
-        public IDictionary<string, object> User { get; internal set; }
+        public User User { get; internal set; }
     }
 }
