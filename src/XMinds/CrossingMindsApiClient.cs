@@ -826,7 +826,7 @@ namespace XMinds
             }
 
             var result = await this.SendRequestAsync<GetUserResult>(HttpMethod.Get,
-                $"users/{this.UserIdToUrlParam(userId)}/",
+                $"users/{this.IdToUrlParam(userId)}/",
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
@@ -837,9 +837,7 @@ namespace XMinds
         /// Creates a new user, or update it if the user id already exists. All properties need to be defined beforehand.
         /// Endpoint: PUT users/{str:user_id}/
         /// </summary>
-        /// <param name="userId">User id. Note that user id cannot be a “null” or “falsy” value, such as empty string
-        /// or 0.</param>
-        /// <param name="user">User data. The dictionary key is property name, dictionary value is property value.</param>
+        /// <param name="user">User data.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
         /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
@@ -865,7 +863,7 @@ namespace XMinds
             userProps.Remove(User.UserIdPropName);
 
             await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, 
-                $"users/{this.UserIdToUrlParam(user.UserId)}/",
+                $"users/{this.IdToUrlParam(user.UserId)}/",
                 bodyParams: new Dictionary<string, object>
                 {
                     { "user", userProps },
@@ -942,7 +940,7 @@ namespace XMinds
         /// <param name="amt">Optional. [max: 500] Maximum amount of users returned, by default is 300.</param>
         /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The database list.</returns>
+        /// <returns>The users list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -978,7 +976,7 @@ namespace XMinds
         /// Endpoint: POST users-bulk/list/
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The user-properties list.</returns>
+        /// <returns>The users list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
@@ -1120,7 +1118,199 @@ namespace XMinds
                 .ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Gets one item properties given its ID.
+        /// Endpoint: GET items/{str:item_id}/
+        /// </summary>
+        /// <param name="itemId">Item Id.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The user data.</returns>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ITEM_NOT_FOUND 
+        /// if no item with the given item_id can be found.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<GetItemResult> GetItemAsync(object itemId,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (itemId == null)
+            {
+                throw new ArgumentException(nameof(itemId));
+            }
 
+            var result = await this.SendRequestAsync<GetItemResult>(HttpMethod.Get,
+                $"items/{this.IdToUrlParam(itemId)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new item, or update it if the item id already exists. All properties need to be defined beforehand.
+        /// Endpoint: PUT items/{str:item_id}/
+        /// </summary>
+        /// <param name="item">Item data.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if the properties are invalid.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task CreateOrUpdateItemAsync(Item item,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (item == null)
+            {
+                throw new ArgumentException(nameof(item));
+            }
+
+            if (item.ItemId == null)
+            {
+                throw new ArgumentException($"{Item.ItemIdPropName} property");
+            }
+
+            // Removes item_id as API endpoint accepts item id in url.
+            var itemProps = new Dictionary<string, object>(item);
+            itemProps.Remove(Item.ItemIdPropName);
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Put,
+                $"items/{this.IdToUrlParam(item.ItemId)}/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "item", itemProps },
+                }, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Creates many items in bulk, or update the ones for which the item_id already exist. 
+        /// All properties need to be defined beforehand. The items data are sent to the server in chunks.
+        /// Endpoint: PUT items-bulk/
+        /// </summary>
+        /// <param name="items">Items data. For each item object at least "item_id" property should be specified.</param>
+        /// <param name="chunkSize">Optional. The chunk size (the number of items included in the chunk), items data
+        /// are sent to the server in chunks of this size (default: 1K).</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if the properties are invalid.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name DUPLICATED_ITEM_ID 
+        /// if an item_id occurs multiple times in the same request.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
+        /// Exception.Data dictionary. The item is the index of last successfuly sent user from the list. 
+        /// The client can use the index to repeat the request starting from "last_processed_index" + 1 item. </remarks>
+        public async Task CreateOrUpdateItemsBulkAsync(List<Item> items, int chunkSize = 1024,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var chunkIndex = 0;
+
+            try
+            {
+                if (items == null)
+                {
+                    throw new ArgumentException(nameof(items));
+                }
+
+                while (chunkIndex < items.Count)
+                {
+                    var actualChunkSize = Math.Min(chunkSize, items.Count - chunkIndex);
+                    var itemsChunk = new List<IDictionary<string, object>>(actualChunkSize);
+                    for (var i = chunkIndex; i < chunkIndex + actualChunkSize; ++i)
+                    {
+                        itemsChunk.Add(items[i]);
+                    }
+
+                    await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, $"items-bulk/",
+                        bodyParams: new Dictionary<string, object>
+                        {
+                            { "items", itemsChunk },
+                        }, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+
+                    chunkIndex += actualChunkSize;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Adding the index of the last successfuly sent item from the list.
+                // The client can use the index to repeat the request starting from index + 1 item.
+                ex.Data.Add("last_processed_index", chunkIndex - 1);
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets multiple items by page. The response is paginated, you can control the response amount and offset 
+        /// using the query parameters amt and cursor.
+        /// Endpoint: GET items-bulk/
+        /// </summary>
+        /// <param name="amt">Optional. [max: 500] Maximum amount of items returned, by default is 300.</param>
+        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The items list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllItemsBulkResult> ListAllItemsBulkAsync(int? amt = null, string cursor = null,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Dictionary<string, object> queryParams = null;
+            if (amt != null || cursor != null)
+            {
+                queryParams = new Dictionary<string, object>();
+                if (amt != null)
+                {
+                    queryParams.Add("amt", amt);
+                }
+
+                if (cursor != null)
+                {
+                    queryParams.Add("cursor", cursor);
+                }
+            }
+
+            var result = await this.SendRequestAsync<ListAllItemsBulkResult>(HttpMethod.Get, "items-bulk/",
+                queryParams: queryParams, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Get multiple items given their IDs. The items in the response are not aligned with the input, 
+        /// the missing items are simply not present in the result.
+        /// Endpoint: POST items-bulk/list/
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The items list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListItemsByIdsResult> ListItemsByIdsAsync(List<object> itemsIds,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (itemsIds == null)
+            {
+                throw new ArgumentException(nameof(itemsIds));
+            }
+
+            var result = await this.SendRequestAsync<ListItemsByIdsResult>(HttpMethod.Post, "items-bulk/list/",
+                bodyParams: new Dictionary<string, object>
+                {
+                    { "items_id", itemsIds },
+                },
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
 
         #endregion
 
@@ -1153,9 +1343,9 @@ namespace XMinds
             }
         }
 
-        private string UserIdToUrlParam(object userId)
+        private string IdToUrlParam(object id)
         {
-            var userIdString = Convert.ToString(userId, CultureInfo.InvariantCulture);
+            var userIdString = Convert.ToString(id, CultureInfo.InvariantCulture);
 
             return Uri.EscapeDataString(userIdString);
         }

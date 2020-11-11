@@ -7,14 +7,14 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The result of GetUserAsync method.
+    /// The result of GetItemAsync method.
     /// </summary>
-    public sealed class GetUserResult
+    public sealed class GetItemResult
     {
         /// <summary>
-        /// The user data.
+        /// The item data.
         /// </summary>
-        [JsonProperty("user")]
-        public User User { get; internal set; }
+        [JsonProperty("item")]
+        public Item Item { get; internal set; }
     }
 }
