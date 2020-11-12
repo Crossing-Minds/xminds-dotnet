@@ -21,6 +21,10 @@ namespace XMinds.Example
         const string SubscriptionsUserProp = "subscriptions";
         const string ToBeDeletedUserProp = "to_be_deleted";
 
+        const string PriceItemProp = "price";
+        const string TagsItemProp = "tags";
+        const string ToBeDeletedItemProp = "to_be_deleted";
+
         static void Main(string[] args)
         {
             RunExample().GetAwaiter().GetResult();
@@ -69,6 +73,7 @@ namespace XMinds.Example
 
             var currentDatabaseStatus = await apiClient.GetCurrentDatabaseStatusAsync();
 
+
             await apiClient.CreateUserPropertyAsync(AgeUserProp, "uint8", false);
             await apiClient.CreateUserPropertyAsync(SubscriptionsUserProp, "unicode30", true);
             await apiClient.CreateUserPropertyAsync(ToBeDeletedUserProp, "float", false);
@@ -104,6 +109,44 @@ namespace XMinds.Example
             var listAllUsersBulkResult = await apiClient.ListAllUsersBulkAsync();
 
             var listUsersByIdsResult = await apiClient.ListUsersByIdsAsync(new List<object>() { user1.UserId, user2.UserId });
+
+
+            await apiClient.CreateItemPropertyAsync(PriceItemProp, "float32", false);
+            await apiClient.CreateItemPropertyAsync(TagsItemProp, "unicode32", true);
+            await apiClient.CreateItemPropertyAsync(ToBeDeletedItemProp, "float", false);
+
+            var tagsItemProperty = await apiClient.GetItemPropertyAsync(TagsItemProp);
+
+            await apiClient.DeleteItemPropertyAsync(ToBeDeletedItemProp);
+
+            var listAllItemPropertiesResult = await apiClient.ListAllItemPropertiesAsync();
+
+            var item1 = new Item(new Dictionary<string, object>
+            {
+                { Item.ItemIdPropName, Guid.NewGuid() },
+                { PriceItemProp, 9.99 },
+                { TagsItemProp, new List<string> { "family", "sci-fi" } }
+            });
+
+            await apiClient.CreateOrUpdateItemAsync(item1);
+
+            var getItemResult = await apiClient.GetItemAsync(item1.ItemId);
+
+            item1[PriceItemProp] = 10.99;
+
+            var item2 = new Item(new Dictionary<string, object>
+            {
+                { Item.ItemIdPropName, Guid.NewGuid() },
+                { PriceItemProp, 4.49 },
+                { TagsItemProp, new List<string> { "family" } }
+            });
+
+            await apiClient.CreateOrUpdateItemsBulkAsync(new List<Item> { item1, item2 });
+
+            var listAllItemsBulkResult = await apiClient.ListAllItemsBulkAsync();
+
+            var listItemsByIdsResult = await apiClient.ListItemsByIdsAsync(new List<object>() { item1.ItemId, item2.ItemId });
+
 
             await apiClient.DeleteCurrentDatabaseAsync();
 

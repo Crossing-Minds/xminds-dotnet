@@ -1104,7 +1104,7 @@ namespace XMinds
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
-        public async Task DeletItemPropertyAsync(string propertyName,
+        public async Task DeleteItemPropertyAsync(string propertyName,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(propertyName))
