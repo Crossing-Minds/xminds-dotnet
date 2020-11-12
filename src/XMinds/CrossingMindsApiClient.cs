@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using XMinds.Api;
+using XMinds.Utils;
 
 namespace XMinds
 {
@@ -1203,7 +1204,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
-        /// Exception.Data dictionary. The item is the index of last successfuly sent user from the list. 
+        /// Exception.Data dictionary. The item is the index of last successfuly sent item from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 item. </remarks>
         public async Task CreateOrUpdateItemsBulkAsync(List<Item> items, int chunkSize = 1024,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -1313,6 +1314,311 @@ namespace XMinds
         }
 
         #endregion
+
+        #region Ratings
+
+        /// <summary>
+        ///  create or update a rating for a user and an item. If the rating exists for the tuple (user id, item id) 
+        ///  then it is updated, otherwise it is created.
+        /// Endpoint: PUT users/{str:user_id}/ratings/{str:item_id}/
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="itemId">Item id.</param>
+        /// <param name="rating">Rating value. [min: 1 max: 10].</param>
+        /// <param name="timestamp">Optional. Rating timestamp (default: now).</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task CreateOrUpdateRatingAsync(object userId, object itemId, float rating, 
+            DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
+            if (itemId == null)
+            {
+                throw new ArgumentException(nameof(itemId));
+            }
+
+            var ratingProps = new Dictionary<string, object>()
+            {
+                { "rating", rating }
+            };
+
+            if (timestamp != null)
+            {
+                ratingProps.Add("timestamp", timestamp.Value.ToUnixDateTime());
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Put,
+                $"users/{this.IdToUrlParam(userId)}/ratings/{this.IdToUrlParam(itemId)}/",
+                bodyParams: ratingProps, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Deletes a single rating for a given user.
+        /// Endpoint: DELETE users/{str:user_id}/ratings/{str:item_id}/
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <param name="itemId">Item Id.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name USER_RATING_NOT_FOUND 
+        /// if the user does not have a rating for this item.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteRatingAsync(object userId, object itemId,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+            
+            if (itemId == null)
+            {
+                throw new ArgumentException(nameof(itemId));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete,
+                $"users/{this.IdToUrlParam(userId)}/ratings/{this.IdToUrlParam(itemId)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets multiple items by page. The response is paginated, you can control the response amount and offset 
+        /// using the query parameters amt and cursor.
+        /// Endpoint: GET users/{str:user_id}/ratings/
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <param name="amt">Optional. [min: 1 max: 64] Amount of ratings to return.</param>
+        /// <param name="page">Optional. [min: 1] Page to be listed.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The items list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListUserRatingsResult> ListUserRatingsAsync(object userId, 
+            int? amt = null, int? page = null,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
+            Dictionary<string, object> queryParams = null;
+            if (amt != null || page != null)
+            {
+                queryParams = new Dictionary<string, object>();
+                if (amt != null)
+                {
+                    queryParams.Add("amt", amt);
+                }
+
+                if (page != null)
+                {
+                    queryParams.Add("page", page);
+                }
+            }
+
+            var result = await this.SendRequestAsync<ListUserRatingsResult>(HttpMethod.Get, 
+                $"users/{this.IdToUrlParam(userId)}/ratings/",
+                queryParams: queryParams, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates or updates bulks of ratings for a single user and many items. 
+        /// Endpoint: PUT users/{str:user_id}/ratings/
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <param name="ratings">Ratings data.</param>
+        /// <param name="chunkSize">Optional. The chunk size (the number of items included in the chunk), items data
+        /// are sent to the server in chunks of this size (default: 1K).</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
+        /// Exception.Data dictionary. The item is the index of last successfuly sent rating from the list. 
+        /// The client can use the index to repeat the request starting from "last_processed_index" + 1 rating. </remarks>
+        public async Task CreateOrUpdateUserRatingsBulkAsync(object userId, List<ItemRating> ratings, int chunkSize = 1024,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var chunkIndex = 0;
+
+            try
+            {
+                if (userId == null)
+                {
+                    throw new ArgumentException(nameof(userId));
+                }
+
+                if (ratings == null)
+                {
+                    throw new ArgumentException(nameof(ratings));
+                }
+
+                while (chunkIndex < ratings.Count)
+                {
+                    var actualChunkSize = Math.Min(chunkSize, ratings.Count - chunkIndex);
+                    var itemsChunk = new List<ItemRating>(actualChunkSize);
+                    for (var i = chunkIndex; i < chunkIndex + actualChunkSize; ++i)
+                    {
+                        itemsChunk.Add(ratings[i]);
+                    }
+
+                    await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, 
+                        $"users/{this.IdToUrlParam(userId)}/ratings/",
+                        bodyParams: new Dictionary<string, object>
+                        {
+                            { "ratings", itemsChunk },
+                        }, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+
+                    chunkIndex += actualChunkSize;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Adding the index of the last successfuly sent item from the list.
+                // The client can use the index to repeat the request starting from index + 1 ratings.
+                ex.Data.Add("last_processed_index", chunkIndex - 1);
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Deletes all ratings of a given user.
+        /// Endpoint: DELETE users/{str:user_id}/ratings/
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task DeleteRatingAsync(object userId,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (userId == null)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Delete,
+                $"users/{this.IdToUrlParam(userId)}/ratings/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Creates or updates large bulks of ratings for many users and many items. 
+        /// Endpoint: PUT ratings-bulk/
+        /// </summary>
+        /// <param name="ratings">Ratings data.</param>
+        /// <param name="chunkSize">Optional. The chunk size (the number of ratings included in the chunk), ratings data
+        /// are sent to the server in chunks of this size (default: 1K).</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        /// <remarks>In case of exception, the exception contains "last_processed_index" item in 
+        /// Exception.Data dictionary. The item is the index of last successfuly sent rating from the list. 
+        /// The client can use the index to repeat the request starting from "last_processed_index" + 1 rating. </remarks>
+        public async Task CreateOrUpdateRatingsBulkAsync(List<UserItemRating> ratings, int chunkSize = 1024,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var chunkIndex = 0;
+
+            try
+            {
+                if (ratings == null)
+                {
+                    throw new ArgumentException(nameof(ratings));
+                }
+
+                while (chunkIndex < ratings.Count)
+                {
+                    var actualChunkSize = Math.Min(chunkSize, ratings.Count - chunkIndex);
+                    var itemsChunk = new List<UserItemRating>(actualChunkSize);
+                    for (var i = chunkIndex; i < chunkIndex + actualChunkSize; ++i)
+                    {
+                        itemsChunk.Add(ratings[i]);
+                    }
+
+                    await this.SendRequestAsync<VoidEntity>(HttpMethod.Put, $"ratings-bulk/",
+                        bodyParams: new Dictionary<string, object>
+                        {
+                            { "ratings", itemsChunk },
+                        }, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+
+                    chunkIndex += actualChunkSize;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Adding the index of the last successfuly sent item from the list.
+                // The client can use the index to repeat the request starting from index + 1 item.
+                ex.Data.Add("last_processed_index", chunkIndex - 1);
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets multiple items by page. The response is paginated, you can control the response amount and offset 
+        /// using the query parameters amt and cursor.
+        /// Endpoint: GET items-bulk/
+        /// </summary>
+        /// <param name="amt">Optional. [max: 500] Maximum amount of items returned, by default is 300.</param>
+        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The items list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListAllRatingsBulkResult> ListAllRatingsBulkAsync(int? amt = null, string cursor = null,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Dictionary<string, object> queryParams = null;
+            if (amt != null || cursor != null)
+            {
+                queryParams = new Dictionary<string, object>();
+                if (amt != null)
+                {
+                    queryParams.Add("amt", amt);
+                }
+
+                if (cursor != null)
+                {
+                    queryParams.Add("cursor", cursor);
+                }
+            }
+
+            var result = await this.SendRequestAsync<ListAllRatingsBulkResult>(HttpMethod.Get, "ratings-bulk/",
+                queryParams: queryParams, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        #endregion
+
 
         #region General code 
 
