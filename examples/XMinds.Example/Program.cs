@@ -73,6 +73,7 @@ namespace XMinds.Example
 
             var currentDatabaseStatus = await apiClient.GetCurrentDatabaseStatusAsync();
 
+            #region Users Data and Properties
 
             await apiClient.CreateUserPropertyAsync(AgeUserProp, "uint8", false);
             await apiClient.CreateUserPropertyAsync(SubscriptionsUserProp, "unicode30", true);
@@ -110,6 +111,9 @@ namespace XMinds.Example
 
             var listUsersByIdsResult = await apiClient.ListUsersByIdsAsync(new List<object>() { user1.UserId, user2.UserId });
 
+            #endregion
+
+            #region Items Data and Properties
 
             await apiClient.CreateItemPropertyAsync(PriceItemProp, "float32", false);
             await apiClient.CreateItemPropertyAsync(TagsItemProp, "unicode32", true);
@@ -147,6 +151,44 @@ namespace XMinds.Example
 
             var listItemsByIdsResult = await apiClient.ListItemsByIdsAsync(new List<object>() { item1.ItemId, item2.ItemId });
 
+            #endregion
+
+            #region User Ratings
+
+            await apiClient.CreateOrUpdateRatingAsync(user1.UserId, item1.ItemId, 5);
+            await apiClient.CreateOrUpdateRatingAsync(user1.UserId, item2.ItemId, 7);
+            await apiClient.CreateOrUpdateRatingAsync(user2.UserId, item1.ItemId, 8);
+            await apiClient.CreateOrUpdateRatingAsync(user2.UserId, item2.ItemId, 9);
+            await apiClient.CreateOrUpdateRatingAsync(user1.UserId, item1.ItemId, 6);
+
+            var listAllRatingsBulk = await apiClient.ListAllRatingsBulkAsync();
+
+            await apiClient.DeleteRatingAsync(user1.UserId, item1.ItemId);
+
+            var listUserRatingsResult = await apiClient.ListUserRatingsAsync(user1.UserId);
+
+            await apiClient.CreateOrUpdateUserRatingsBulkAsync(user1.UserId, new List<ItemRating>
+            {
+                new ItemRating(item1.ItemId, 3, DateTime.Now),
+                new ItemRating(item2.ItemId, 4, DateTime.Now),
+            }); 
+
+            var listAllRatingsBulk2 = await apiClient.ListAllRatingsBulkAsync();
+
+            await apiClient.DeleteRatingAsync(user1.UserId);
+
+            var listAllRatingsBulk3 = await apiClient.ListAllRatingsBulkAsync();
+
+            await apiClient.CreateOrUpdateRatingsBulkAsync(new List<UserItemRating>
+            {
+                new UserItemRating(user1.UserId, item1.ItemId, 3, DateTime.Now),
+                new UserItemRating(user1.UserId, item2.ItemId, 4, DateTime.Now),
+                new UserItemRating(user2.UserId, item2.ItemId, 1, DateTime.Now),
+            });
+
+            var listAllRatingsBulk4 = await apiClient.ListAllRatingsBulkAsync();
+
+            #endregion
 
             await apiClient.DeleteCurrentDatabaseAsync();
 

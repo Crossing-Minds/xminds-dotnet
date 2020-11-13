@@ -1315,11 +1315,11 @@ namespace XMinds
 
         #endregion
 
-        #region Ratings
+        #region User Ratings
 
         /// <summary>
-        ///  create or update a rating for a user and an item. If the rating exists for the tuple (user id, item id) 
-        ///  then it is updated, otherwise it is created.
+        /// Creates or updates a rating for a user and an item. If the rating exists for the tuple (user id, item id) 
+        /// then it is updated, otherwise it is created.
         /// Endpoint: PUT users/{str:user_id}/ratings/{str:item_id}/
         /// </summary>
         /// <param name="userId">User id.</param>
