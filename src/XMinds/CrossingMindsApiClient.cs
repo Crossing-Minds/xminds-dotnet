@@ -1619,6 +1619,63 @@ namespace XMinds
 
         #endregion
 
+        #region Recommendation
+
+        /// <summary>
+        /// Gets similar items. The response is paginated, you can control the response amount and offset 
+        /// using the query parameters amt and cursor.
+        /// Endpoint: GET recommendation/items/{str:item_id}/items/
+        /// </summary>
+        /// <param name="amt">Optional. [max: 64] Maximum amount of items returned.</param>
+        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from 
+        /// the previous response.</param>
+        /// <param name="filters">Optional. Filter by properties. Filter format: 
+        /// ["{PROP_NAME}:{OPERATOR}:{OPTIONAL_VALUE}",...].</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The items list.</returns>
+        /// <exception cref="ServiceUnavailableException">ServerUnavailable with error name DATABASE_NOT_READY
+        /// if no ML model has been trained for this database.</exception>
+        /// <exception cref="NotFoundErrorException">NotFoundError with error name ITEM_NOT_FOUND
+        /// if the item does not exist.</exception>
+        /// <exception cref="WrongDataException">WrongData with error name WRONG_DATA_TYPE 
+        /// if any filter is invalid.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<GetRecoItemToItemsResult> GetRecoItemToItemsAsync(object itemId, 
+            int? amt = null, string cursor = null, List<string> filters = null, 
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Dictionary<string, object> queryParams = null;
+            if (amt != null || cursor != null || filters != null)
+            {
+                queryParams = new Dictionary<string, object>();
+                if (amt != null)
+                {
+                    queryParams.Add("amt", amt);
+                }
+
+                if (cursor != null)
+                {
+                    queryParams.Add("cursor", cursor);
+                }
+
+                if (cursor != null)
+                {
+                    queryParams.Add("filters", filters.ToArray());
+                }
+            }
+
+            var result = await this.SendRequestAsync<GetRecoItemToItemsResult>(HttpMethod.Get,
+                $"recommendation/items/{this.IdToUrlParam(itemId)}/items/",
+                queryParams: queryParams, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+
+        #endregion
 
         #region General code 
 
