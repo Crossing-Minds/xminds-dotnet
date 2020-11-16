@@ -188,6 +188,52 @@ namespace XMinds.Example
 
             var listAllRatingsBulk4 = await apiClient.ListAllRatingsBulkAsync();
 
+            await apiClient.CreateOrUpdateRatingsBulkAsync(new List<UserItemRating>
+            {
+                new UserItemRating(user1.UserId, item1.ItemId, 3, DateTime.Now),
+                new UserItemRating(user1.UserId, item2.ItemId, 4, DateTime.Now),
+                new UserItemRating(user2.UserId, item2.ItemId, 1, DateTime.Now),
+            });
+
+            #endregion
+
+            #region Recommendation and Background Tasks
+
+            var random = new Random();
+            var items = new List<Item>();
+            var itemsRatings = new List<ItemRating>();
+            for (int i = 0; i < 20; ++i)
+            {
+                var item = new Item(new Dictionary<string, object>
+                {
+                    { Item.ItemIdPropName, Guid.NewGuid() },
+                    { PriceItemProp, random.NextDouble() * 10.0 },
+                    { TagsItemProp, new List<string> { "family" } }
+                });
+                items.Add(item);
+
+                var itemRating = new ItemRating(item.ItemId, random.Next(1, 10), DateTime.Now);
+                itemsRatings.Add(itemRating);
+            }
+
+            await apiClient.CreateOrUpdateItemsBulkAsync(items);
+            await apiClient.CreateOrUpdateUserRatingsBulkAsync(user1.UserId, itemsRatings);
+
+            await apiClient.TriggerBackgroundTaskAsync(BackgroundTaskName.MlModelRetrain);
+
+            // Just required to wait while training task completes to be able to continue the example.
+            await Task.Delay(5000);
+
+            var listRecentBackgroundTasks = await apiClient.ListRecentBackgroundTasksAsync(BackgroundTaskName.MlModelRetrain);
+
+            var filters = new List<string> { $"{PriceItemProp}:{RecoFilterOperator.Gt}:5" };
+
+            var getRecoItemToItemsResult = await apiClient.GetRecoItemToItemsAsync(item1.ItemId, filters: filters);
+
+            var getRecoSessionToItemsResult = await apiClient.GetRecoSessionToItemsAsync(filters: filters);
+
+            var getRecoUserToItemsResult = await apiClient.GetRecoUserToItemsAsync(user1.UserId, filters: filters);
+
             #endregion
 
             await apiClient.DeleteCurrentDatabaseAsync();

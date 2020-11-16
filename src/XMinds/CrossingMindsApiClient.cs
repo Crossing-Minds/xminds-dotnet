@@ -1809,6 +1809,64 @@ namespace XMinds
 
         #endregion
 
+        #region Background Tasks
+
+        /// <summary>
+        /// Manually triggers a background task.
+        /// Endpoint: POST tasks/{str:task_name}/
+        /// </summary>
+        /// <param name="taskName">The task name. The allowed task names are in <c>BackgroundTaskName</c> 
+        /// class.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <exception cref="ArgumentException">If input parameters are not specified.</exception>
+        /// <exception cref="DuplicatedErrorException">DuplicatedError with error name TASK_ALREADY_RUNNING
+        /// if this task is already running.</exception>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task TriggerBackgroundTaskAsync(string taskName, 
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrEmpty(taskName))
+            {
+                throw new ArgumentException(nameof(taskName));
+            }
+
+            await this.SendRequestAsync<VoidEntity>(HttpMethod.Post, 
+                $"tasks/{Uri.EscapeDataString(taskName)}/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Lists recent background tasks.
+        /// Endpoint: GET tasks/{str:task_name}/recents/
+        /// </summary>
+        /// <param name="taskName">The task name. The allowed task names are in <c>BackgroundTaskName</c> 
+        /// class.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The background tasks list.</returns>
+        /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
+        /// <exception cref="HttpRequestException">A network error occurs.</exception>
+        /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
+        public async Task<ListRecentBackgroundTasksResult> ListRecentBackgroundTasksAsync(string taskName,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (taskName == null)
+            {
+                throw new ArgumentException(nameof(taskName));
+            }
+
+            var result = await this.SendRequestAsync<ListRecentBackgroundTasksResult>(HttpMethod.Get, 
+                $"tasks/{Uri.EscapeDataString(taskName)}/recents/",
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return result;
+        }
+
+        #endregion
+
         #region General code 
 
         private async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
