@@ -73,12 +73,28 @@ namespace XMinds.Api
                 var queryParamsBuilder = new StringBuilder(1000);
                 foreach(var queryParam in queryParams)
                 {
-                    if (queryParamsBuilder.Length != 0)
+                    // queryParam is IEnumerable, that means we should pass array of the values for the same key.
+                    if (queryParam.Value is System.Collections.IEnumerable enumerableValues)
                     {
-                        queryParamsBuilder.Append("&");
-                    }
+                        foreach(object value in enumerableValues)
+                        {
+                            if (queryParamsBuilder.Length != 0)
+                            {
+                                queryParamsBuilder.Append("&");
+                            }
 
-                    queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(queryParam.Value.ToString())}");
+                            queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(value.ToString())}");
+                        }
+                    }
+                    else
+                    {
+                        if (queryParamsBuilder.Length != 0)
+                        {
+                            queryParamsBuilder.Append("&");
+                        }
+
+                        queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(queryParam.Value.ToString())}");
+                    }
                 }
 
                 query = $"{path}?{queryParamsBuilder.ToString()}";

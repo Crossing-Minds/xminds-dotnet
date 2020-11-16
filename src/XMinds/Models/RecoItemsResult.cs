@@ -6,14 +6,14 @@ using System.Text;
 namespace XMinds
 {
     /// <summary>
-    /// The result of GetRecoItemToItemsResultAsync method.
+    /// The result of GetRecoItemToItemsResultAsync and GetRecoUserToItemsResultAsync method.
     /// </summary>
-    public sealed class GetRecoItemToItemsResult
+    public sealed class RecoItemsResult
     {
         /// <summary>
         ///  Items IDs.
         /// </summary>
-        [JsonProperty("items_id ")]
+        [JsonProperty("items_id")]
         public IReadOnlyList<string> ItemsId { get; internal set; }
 
         /// <summary>
