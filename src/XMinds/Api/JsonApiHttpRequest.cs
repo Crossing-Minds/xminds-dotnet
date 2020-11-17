@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +14,7 @@ namespace XMinds.Api
     {
         private static readonly Dictionary<string, string> headers = new Dictionary<string, string>()
         {
-            // TODO: define User-Agent header.
-            //'User-Agent': f'CrossingMinds/{__version__} (Python/{PYV}; JSON)',
+            { "User-Agent", $"CrossingMinds/{typeof(ApiClient).GetTypeInfo().Assembly.GetName().Version} (C#; JSON)" },
             { "Accept", "application/json" }
         };
 
@@ -40,14 +40,14 @@ namespace XMinds.Api
 
             if (httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
             {
-                return default(TResponseModel);
+                return default;
             }
 
             var responseJson = await httpResponseMessage.Content.ReadAsStringAsync()
                 .ConfigureAwait(false); 
             if (responseJson == null)
             {
-                return default(TResponseModel);
+                return default;
             }
 
             cancellationToken.ThrowIfCancellationRequested();

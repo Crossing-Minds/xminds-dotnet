@@ -63,7 +63,7 @@ namespace XMinds.Api
         public async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
              Dictionary<string, object> queryParams = null,
             Dictionary<string, object> bodyParams = null, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -97,7 +97,7 @@ namespace XMinds.Api
                     }
                 }
 
-                query = $"{path}?{queryParamsBuilder.ToString()}";
+                query = $"{path}?{queryParamsBuilder}";
             }
 
             using (var request = new HttpRequestMessage(httpMethod, query))
@@ -138,7 +138,7 @@ namespace XMinds.Api
 
         private XMindsErrorException CreateRequestException(int httpStatusCode, ApiError apiError)
         {
-            XMindsErrorException exception = null;
+            XMindsErrorException exception;
             if (httpStatusCode >= 500)
             {
                 if (httpStatusCode == (int) HttpStatusCode.ServiceUnavailable)

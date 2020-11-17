@@ -6,8 +6,21 @@ using System.Threading.Tasks;
 
 namespace XMinds.Example
 {
+
+    /// <summary>
+    /// The goal of this example is just to demonstrate XMinds SDK using. It does 
+    /// not give live sample, just shows how to call SDK methods.
+    /// IMPORTANT: If the example fails, the test accounts and test database 
+    /// can be left in your account.
+    /// </summary>
     class Program
     {
+        ////////////////////////////////////////////////////////////////////
+        // Put your creadentials to run the example. 
+        // IMPORTANT: If the example fails, the test accounts and test database 
+        // can be left in your account.
+        ////////////////////////////////////////////////////////////////////
+
         const string XMindsApiRootEmail = "your_root_email";
         const string XMindsApiRootPassword = "your_root_password";
 
@@ -16,6 +29,8 @@ namespace XMinds.Example
         
         const string XMindsApiServiceAccountName = "your_service_account_name";
         const string XMindsApiServiceAccountPassword = "your_service_account_password";
+
+        ////////////////////////////////////////////////////////////////////
 
         const string AgeUserProp = "age";
         const string SubscriptionsUserProp = "subscriptions";
@@ -41,6 +56,9 @@ namespace XMinds.Example
                 Role.Manager, "John", "Doe");
 
             await apiClient.ResendVerificationCodeAsync(XMindsApiIndividualAccountEmail);
+
+            // The delay just to give enough time to server to generate and send verification code.
+            await Task.Delay(30000);
 
             try
             {

@@ -15,7 +15,7 @@ namespace XMinds
     /// </summary>
     public sealed class CrossingMindsApiClient : IDisposable
     {
-        private ApiClient apiClient = new ApiClient(new JsonApiHttpRequest());
+        private readonly ApiClient apiClient = new ApiClient(new JsonApiHttpRequest());
 
         private string refreshToken = null;
         private Database database = null;
@@ -59,7 +59,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<LoginRootResult> LoginRootAsync(string email, string password,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -106,7 +106,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<LoginResult> LoginIndividualAsync(string email, string password, string dbId, 
-            object frontendUserId = null, CancellationToken cancellationToken = default(CancellationToken))
+            object frontendUserId = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -164,7 +164,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<LoginResult> LoginServiceAsync(string name, string password, string dbId,
-            object frontendUserId = null, CancellationToken cancellationToken = default(CancellationToken))
+            object frontendUserId = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -222,7 +222,7 @@ namespace XMinds
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
-        public async Task<LoginResult> LoginRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<LoginResult> LoginRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(refreshToken))
             {
@@ -260,7 +260,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllAccountsResult> ListAllAccountsAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var result = await this.SendRequestAsync<ListAllAccountsResult>(HttpMethod.Get, "organizations/current/accounts/",
                 cancellationToken: cancellationToken)
@@ -287,7 +287,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<CreatedAccount> CreateIndividualAccountAsync(string email, string password, string role,
-            string firstName, string lastName, CancellationToken cancellationToken = default(CancellationToken))
+            string firstName, string lastName, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -341,7 +341,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteIndividualAccountAsync(string email,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -377,7 +377,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<CreatedAccount> CreateServiceAccountAsync(string name, string password, string role,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -419,7 +419,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteServiceAccountAsync(string name,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -454,7 +454,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task ResendVerificationCodeAsync(string email,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -485,7 +485,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task VerifyAsync(string email, string code,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -516,7 +516,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteCurrentAccountAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (!this.apiClient.IsAuthJwtTokenSet())
             {
@@ -552,7 +552,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<CreatedDatabase> CreateDatabaseAsync(string name, string description, string item_id_type,
-            string user_id_type, CancellationToken cancellationToken = default(CancellationToken))
+            string user_id_type, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -599,7 +599,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllDatabasesResult> ListAllDatabasesAsync(int? page = null, int? amt = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (page != null || amt != null)
@@ -633,7 +633,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<CurrentDatabase> GetCurrentDatabaseAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var result = await this.SendRequestAsync<CurrentDatabase>(HttpMethod.Get, "databases/current/",
                 cancellationToken: cancellationToken)
@@ -652,7 +652,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteCurrentDatabaseAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (this.database == null)
             {
@@ -678,7 +678,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<CurrentDatabaseStatus> GetCurrentDatabaseStatusAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var result = await this.SendRequestAsync<CurrentDatabaseStatus>(HttpMethod.Get, "databases/current/status/",
                 cancellationToken: cancellationToken)
@@ -701,7 +701,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllUserPropertiesResult> ListAllUserPropertiesAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var result = await this.SendRequestAsync<ListAllUserPropertiesResult>(HttpMethod.Get, "users-properties/",
                 cancellationToken: cancellationToken)
@@ -730,7 +730,7 @@ namespace XMinds
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task CreateUserPropertyAsync(string propertyName, 
             string valueType, bool repeated = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -765,7 +765,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<Property> GetUserPropertyAsync(string propertyName,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -793,7 +793,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteUserPropertyAsync(string propertyName,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -820,7 +820,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<GetUserResult> GetUserAsync(object userId,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (userId == null)
             {
@@ -848,7 +848,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task CreateOrUpdateUserAsync(User user,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (user == null)
             {
@@ -894,7 +894,7 @@ namespace XMinds
         /// Exception.Data dictionary. The item is the index of last successfuly sent user from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 user. </remarks>
         public async Task CreateOrUpdateUsersBulkAsync(List<User> users, int chunkSize = 1024,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var chunkIndex = 0;
 
@@ -947,7 +947,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllUsersBulkResult> ListAllUsersBulkAsync(int? amt = null, string cursor = null, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (amt != null || cursor != null)
@@ -984,7 +984,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListUsersByIdsResult> ListUsersByIdsAsync(List<object> usersIds,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (usersIds == null)
             {
@@ -1016,7 +1016,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllItemPropertiesResult> ListAllItemPropertiesAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var result = await this.SendRequestAsync<ListAllItemPropertiesResult>(HttpMethod.Get, "items-properties/",
                 cancellationToken: cancellationToken)
@@ -1045,7 +1045,7 @@ namespace XMinds
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task CreateItemPropertyAsync(string propertyName,
             string valueType, bool repeated = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -1080,7 +1080,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<Property> GetItemPropertyAsync(string propertyName,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -1108,7 +1108,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteItemPropertyAsync(string propertyName,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -1135,7 +1135,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<GetItemResult> GetItemAsync(object itemId,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (itemId == null)
             {
@@ -1163,7 +1163,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task CreateOrUpdateItemAsync(Item item,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (item == null)
             {
@@ -1209,7 +1209,7 @@ namespace XMinds
         /// Exception.Data dictionary. The item is the index of last successfuly sent item from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 item. </remarks>
         public async Task CreateOrUpdateItemsBulkAsync(List<Item> items, int chunkSize = 1024,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var chunkIndex = 0;
 
@@ -1262,7 +1262,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllItemsBulkResult> ListAllItemsBulkAsync(int? amt = null, string cursor = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (amt != null || cursor != null)
@@ -1298,7 +1298,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListItemsByIdsResult> ListItemsByIdsAsync(List<object> itemsIds,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (itemsIds == null)
             {
@@ -1335,7 +1335,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task CreateOrUpdateRatingAsync(object userId, object itemId, float rating, 
-            DateTime? timestamp = null, CancellationToken cancellationToken = default(CancellationToken))
+            DateTime? timestamp = null, CancellationToken cancellationToken = default)
         {
             if (userId == null)
             {
@@ -1377,7 +1377,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteRatingAsync(object userId, object itemId,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (userId == null)
             {
@@ -1410,7 +1410,7 @@ namespace XMinds
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListUserRatingsResult> ListUserRatingsAsync(object userId, 
             int? amt = null, int? page = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (userId == null)
             {
@@ -1457,7 +1457,7 @@ namespace XMinds
         /// Exception.Data dictionary. The item is the index of last successfuly sent rating from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 rating. </remarks>
         public async Task CreateOrUpdateUserRatingsBulkAsync(object userId, List<ItemRating> ratings, int chunkSize = 1024,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var chunkIndex = 0;
 
@@ -1514,7 +1514,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task DeleteRatingAsync(object userId,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (userId == null)
             {
@@ -1543,7 +1543,7 @@ namespace XMinds
         /// Exception.Data dictionary. The item is the index of last successfuly sent rating from the list. 
         /// The client can use the index to repeat the request starting from "last_processed_index" + 1 rating. </remarks>
         public async Task CreateOrUpdateRatingsBulkAsync(List<UserItemRating> ratings, int chunkSize = 1024,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var chunkIndex = 0;
 
@@ -1596,7 +1596,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListAllRatingsBulkResult> ListAllRatingsBulkAsync(int? amt = null, string cursor = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (amt != null || cursor != null)
@@ -1648,7 +1648,7 @@ namespace XMinds
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<RecoItemsResult> GetRecoItemToItemsAsync(object itemId, 
             int? amt = null, string cursor = null, List<string> filters = null, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (amt != null || cursor != null || filters != null)
@@ -1704,7 +1704,7 @@ namespace XMinds
         public async Task<RecoItemsResult> GetRecoSessionToItemsAsync(
             List<RecoItemRating> ratings = null, Dictionary<string, object> userProperties = null,
             int? amt = null, string cursor = null, List<string> filters = null, bool excludeRatedItems = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> bodyParams = null;
             if (ratings != null || userProperties != null || amt != null || cursor != null 
@@ -1776,7 +1776,7 @@ namespace XMinds
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<RecoItemsResult> GetRecoUserToItemsAsync(object userId,
             int? amt = null, string cursor = null, List<string> filters = null, bool excludeRatedItems = false,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             Dictionary<string, object> queryParams = null;
             if (amt != null || cursor != null || filters != null || excludeRatedItems)
@@ -1829,7 +1829,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task TriggerBackgroundTaskAsync(string taskName, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(taskName))
             {
@@ -1854,7 +1854,7 @@ namespace XMinds
         /// <exception cref="HttpRequestException">A network error occurs.</exception>
         /// <exception cref="TaskCanceledException">The call was cancelled or timeout occurs.</exception>
         public async Task<ListRecentBackgroundTasksResult> ListRecentBackgroundTasksAsync(string taskName,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (taskName == null)
             {
@@ -1876,7 +1876,7 @@ namespace XMinds
         private async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
             Dictionary<string, object> queryParams = null,
             Dictionary<string, object> bodyParams = null, 
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             try
             {

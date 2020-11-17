@@ -62,8 +62,7 @@ namespace XMinds
                     this.Data.Add(dataItem.Key, dataItem.Value?.ToString());
                 }
 
-                object retryAfter = null;
-                if (apiError.ErrorData.TryGetValue("retry_after", out retryAfter) && retryAfter != null)
+                if (apiError.ErrorData.TryGetValue("retry_after", out object retryAfter) && retryAfter != null)
                 {
                     this.RetryAfter = (int)retryAfter;
                 }

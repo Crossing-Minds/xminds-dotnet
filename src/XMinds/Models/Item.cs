@@ -26,8 +26,7 @@ namespace XMinds
         { 
             get
             {
-                object value = null;
-                if (!this.TryGetValue(ItemIdPropName, out value))
+                if (!this.TryGetValue(ItemIdPropName, out object value))
                 {
                     return null;
                 }
