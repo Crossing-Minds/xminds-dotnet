@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// Cannot perform authentication.
+    /// </summary>
     public class AuthErrorException : XMindsErrorException
     {
         internal AuthErrorException(ApiError apiError)

@@ -23,8 +23,16 @@ namespace XMinds
         [JsonProperty("rating")] 
         public float Rating { get; set; }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public RecoItemRating() { }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="itemId">Item ID.</param>
+        /// <param name="rating">Rating value. [min: 1 max: 10].</param>
         public RecoItemRating(object itemId, float rating) 
         {
             this.ItemId = itemId;

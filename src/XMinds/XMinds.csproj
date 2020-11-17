@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
+    <Authors>Crossing Minds</Authors>
+    <Product>Crossing Minds Data Science .NET Library</Product>
+    <Copyright>© Copyright 2020, Crossing Minds</Copyright>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.0.2</Version>
+    <NeutralLanguage></NeutralLanguage>
+    <Description>Recommendation and personalization are simple ways to increase sales by making product suggestions to customers based on historical behavior. This can be applied not only to e-commerce but also to music, gaming, events, articles and more.
+Crossing Minds is democratizing access to recent gains in artificial intelligence research by building the world’s best content recommendation platform.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

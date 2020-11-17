@@ -32,6 +32,9 @@ namespace XMinds
 
         #region IDisposable Implementation
 
+        /// <summary>
+        /// IDisposable implementation.
+        /// </summary>
         public void Dispose()
         {
             this.apiClient.Dispose();
@@ -207,8 +210,6 @@ namespace XMinds
         /// Endpoint: POST login/refresh-token/
         /// </summary>
         /// <param name="refreshToken">Refresh token.</param>
-        /// <param name="password">Password.</param>
-        /// <param name="dbId">Database ID.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result login information.</returns>
         /// <exception cref="ArgumentException">The refresh token is not specified.</exception>
@@ -939,7 +940,7 @@ namespace XMinds
         /// Endpoint: GET users-bulk/
         /// </summary>
         /// <param name="amt">Optional. [max: 500] Maximum amount of users returned, by default is 300.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The users list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
@@ -976,6 +977,7 @@ namespace XMinds
         /// the missing users are simply not present in the result.
         /// Endpoint: POST users-bulk/list/
         /// </summary>
+        /// <param name="usersIds">User IDs.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The users list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
@@ -1253,7 +1255,7 @@ namespace XMinds
         /// Endpoint: GET items-bulk/
         /// </summary>
         /// <param name="amt">Optional. [max: 500] Maximum amount of items returned, by default is 300.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The items list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
@@ -1289,6 +1291,7 @@ namespace XMinds
         /// the missing items are simply not present in the result.
         /// Endpoint: POST items-bulk/list/
         /// </summary>
+        /// <param name="itemsIds">Items IDs.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The items list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
@@ -1586,7 +1589,7 @@ namespace XMinds
         /// Endpoint: GET items-bulk/
         /// </summary>
         /// <param name="amt">Optional. [max: 500] Maximum amount of items returned, by default is 300.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from the previous response.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The items list.</returns>
         /// <exception cref="XMindsErrorException">Other Crossing Minds API exceptions.</exception>
@@ -1626,8 +1629,9 @@ namespace XMinds
         /// using the query parameters amt and cursor.
         /// Endpoint: GET recommendation/items/{str:item_id}/items/
         /// </summary>
+        /// <param name="itemId">Item ID.</param>
         /// <param name="amt">Optional. [max: 64] Maximum amount of items returned.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from 
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from 
         /// the previous response.</param>
         /// <param name="filters">Optional. Filter by properties. Filter format: 
         /// ["{PROP_NAME}:{OPERATOR}:{OPTIONAL_VALUE}",...].</param>
@@ -1683,7 +1687,7 @@ namespace XMinds
         /// <param name="userProperties">Optional.Optional. User properties. Useful to solve the 
         /// cold-start problem. The dictionary key is a property name, dictionary value is a property value.</param>
         /// <param name="amt">Optional. [max: 64] Maximum amount of items returned.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from 
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from 
         /// the previous response.</param>
         /// <param name="filters">Optional. Filter by properties. Filter format: 
         /// ["{PROP_NAME}:{OPERATOR}:{OPTIONAL_VALUE}",...].</param>
@@ -1745,15 +1749,16 @@ namespace XMinds
                 .ConfigureAwait(false);
 
             return result;
-        }        
+        }
 
         /// <summary>
         /// Get items recommendations given a user profile. The response is paginated, you can control the response
         /// amount and offset using the query parameters amt and cursor.
         /// Endpoint: GET recommendation/users/{str:user_id}/items/
         /// </summary>
+        /// <param name="userId">User ID.</param>
         /// <param name="amt">Optional. [max: 64] Maximum amount of items returned.</param>
-        /// <param name="page">Optional. Pagination cursor, typically from the NextCursor value from 
+        /// <param name="cursor">Optional. Pagination cursor, typically from the NextCursor value from 
         /// the previous response.</param>
         /// <param name="filters">Optional. Filter by properties. Filter format: 
         /// ["{PROP_NAME}:{OPERATOR}:{OPTIONAL_VALUE}",...].</param>

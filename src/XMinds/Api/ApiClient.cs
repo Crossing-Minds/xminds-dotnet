@@ -192,15 +192,18 @@ namespace XMinds.Api
                 {
                     exception = new MethodNotAllowedException(apiError);
                 }
+                else if (httpStatusCode == (int)TooManyRequestsException.TooManyRequestsHttpStatusCode
+                    && apiError?.ErrorCode == ErrorCode.TooManyRequests)
+                {
+                    exception = new TooManyRequestsException(apiError);
+                }
                 else
                 {
-                    //TODO: review this.
                     exception = new ServerErrorException(httpStatusCode, apiError);
                 }
             }
             else
             {
-                //TODO: review this.
                 exception = new ServerErrorException(httpStatusCode, apiError);
             }
 

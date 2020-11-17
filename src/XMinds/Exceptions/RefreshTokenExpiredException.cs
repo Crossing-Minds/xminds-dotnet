@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// The refresh token has expired.
+    /// </summary>
     public class RefreshTokenExpiredException : XMindsErrorException
     {
         internal RefreshTokenExpiredException(ApiError apiError)

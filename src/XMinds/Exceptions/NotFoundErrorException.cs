@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// Some resource does not exist.
+    /// </summary>
     public class NotFoundErrorException : XMindsErrorException
     {
         internal NotFoundErrorException(ApiError apiError)

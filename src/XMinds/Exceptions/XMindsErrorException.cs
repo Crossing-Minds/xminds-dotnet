@@ -6,13 +6,34 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// The base class for XMinds specific exceptions.
+    /// </summary>
     public class XMindsErrorException : Exception
     {
+        /// <summary>
+        /// HTTP Status Code.
+        /// </summary>
         public int HttpStatusCode { get; private set; }
+
+        /// <summary>
+        /// Error code supported values in <c>ErrorCode</c> class.
+        /// </summary>
         public int? ErrorCode { get; private set; }
+
+        /// <summary>
+        /// Error name.
+        /// </summary>
         public string ErrorName { get; private set; }
+
+        /// <summary>
+        /// Optional. If specified the number of seconds to retry the request to resolve the error.
+        /// </summary>
         public int? RetryAfter { get; private set; }
 
+        /// <summary>
+        /// Additional error data if available.
+        /// </summary>
         public IDictionary<object, object> ErrorData
         {
             get

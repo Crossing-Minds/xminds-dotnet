@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// You do not have enough permissions to access this resource.
+    /// </summary>
     public class ForbiddenErrorException : XMindsErrorException
     {
         internal ForbiddenErrorException(ApiError apiError)

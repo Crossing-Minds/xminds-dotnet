@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// Some resource is duplicated.
+    /// </summary>
     public class DuplicatedErrorException : XMindsErrorException
     {
         internal DuplicatedErrorException(ApiError apiError)

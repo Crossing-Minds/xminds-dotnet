@@ -5,6 +5,9 @@ using System.Text;
 
 namespace XMinds
 {
+    /// <summary>
+    /// The HTTP method is not allowed.
+    /// </summary>
     public class MethodNotAllowedException : XMindsErrorException
     {
         internal MethodNotAllowedException(ApiError apiError)

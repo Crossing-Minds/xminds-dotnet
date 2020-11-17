@@ -39,8 +39,17 @@ namespace XMinds
         [JsonProperty("timestamp")]
         public double UnixTimestamp { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ItemRating() { }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="itemId">Item Id.</param>
+        /// <param name="rating">Rating value. [min: 1 max: 10].</param>
+        /// <param name="timestamp">Rating timestamp.</param>
         public ItemRating(object itemId, float rating, DateTime timestamp) 
         {
             this.ItemId = itemId;
@@ -48,6 +57,12 @@ namespace XMinds
             this.Timestamp = timestamp;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="itemId">Item Id.</param>
+        /// <param name="rating">Rating value. [min: 1 max: 10].</param>
+        /// <param name="unixTimestamp">Rating timestamp in Unix date/time.</param>
         public ItemRating(object itemId, float rating, double unixTimestamp)
         {
             this.ItemId = itemId;
