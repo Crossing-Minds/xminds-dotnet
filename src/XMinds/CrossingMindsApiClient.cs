@@ -1702,15 +1702,9 @@ namespace XMinds
             int? amt = null, string cursor = null, List<string> filters = null, bool excludeRatedItems = false,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            Dictionary<string, object> queryParams = null;
-            if (filters != null)
-            {
-                queryParams = new Dictionary<string, object>();
-                queryParams.Add("filters", filters.ToArray());
-            }
-
             Dictionary<string, object> bodyParams = null;
-            if (ratings != null || userProperties != null || amt != null || cursor != null || excludeRatedItems)
+            if (ratings != null || userProperties != null || amt != null || cursor != null 
+                || filters != null || excludeRatedItems)
             {
                 bodyParams = new Dictionary<string, object>();
                 if (ratings != null)
@@ -1733,6 +1727,11 @@ namespace XMinds
                     bodyParams.Add("cursor", cursor);
                 }
 
+                if (filters != null)
+                {
+                    bodyParams.Add("filters", filters);
+                }
+
                 if (excludeRatedItems)
                 {
                     bodyParams.Add("exclude_rated_items", excludeRatedItems);
@@ -1741,7 +1740,7 @@ namespace XMinds
 
             var result = await this.SendRequestAsync<RecoItemsResult>(HttpMethod.Post,
                 $"recommendation/sessions/items/",
-                queryParams: queryParams, bodyParams: bodyParams,
+                bodyParams: bodyParams,
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
