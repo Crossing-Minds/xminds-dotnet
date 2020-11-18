@@ -15,7 +15,7 @@ namespace XMinds
     /// </summary>
     public sealed class CrossingMindsApiClient : IDisposable
     {
-        private readonly ApiClient apiClient = new ApiClient(new JsonApiHttpRequest());
+        private readonly ApiClient apiClient;
 
         private string refreshToken = null;
         private Database database = null;
@@ -28,6 +28,16 @@ namespace XMinds
         {
             get => this.apiClient.Timeout;
             set => this.apiClient.Timeout = value;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="serverUrl">Optional. The url to API server. By default:
+        /// https://api.crossingminds.com</param>
+        public CrossingMindsApiClient(string serverUrl = null)
+        {
+            this.apiClient = new ApiClient(new JsonApiHttpRequest(), serverUrl);
         }
 
         #region IDisposable Implementation

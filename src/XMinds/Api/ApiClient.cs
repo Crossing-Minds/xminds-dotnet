@@ -12,7 +12,7 @@ namespace XMinds.Api
 {
     sealed class ApiClient : IDisposable
     {
-        private const string ServerUrl = "https://staging-api.crossingminds.com";
+        private const string ServerUrl = "https://api.crossingminds.com";
         private const string ApiVersion = "v1";
 
         private const int DefaultHttpRequestTimeout = 30; // in seconds.
@@ -30,12 +30,12 @@ namespace XMinds.Api
             set => this.httpClient.Timeout = value;
         }
 
-        public ApiClient(IApiHttpRequest apiHttpRequest)
+        public ApiClient(IApiHttpRequest apiHttpRequest, string serverUrl = null)
         {
             this.apiHttpRequest = apiHttpRequest;
 
             this.httpClient.Timeout = TimeSpan.FromSeconds(DefaultHttpRequestTimeout);
-            this.httpClient.BaseAddress = new Uri($"{ServerUrl}/{ ApiVersion}");
+            this.httpClient.BaseAddress = new Uri($"{serverUrl ?? ServerUrl}/{ ApiVersion}");
             this.httpClient.DefaultRequestHeaders.Add("User-Agent", 
                 $"CrossingMinds/{typeof(ApiClient).GetTypeInfo().Assembly.GetName().Version} (C#; JSON)");
         }
