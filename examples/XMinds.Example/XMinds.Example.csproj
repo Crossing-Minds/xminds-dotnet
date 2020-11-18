@@ -50,9 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="XMinds">
-      <Version>0.0.5</Version>
-    </PackageReference>
+    <ProjectReference Include="..\..\src\XMinds\XMinds.csproj">
+      <Project>{8f9d71df-65e8-45c2-b7b1-5b329ca31a1f}</Project>
+      <Name>XMinds</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
