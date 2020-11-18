@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace XMinds.Example
@@ -52,14 +50,14 @@ namespace XMinds.Example
             await apiClient.LoginRootAsync(XMindsApiRootEmail, XMindsApiRootPassword);
 
             var createdIndividualAccount = await apiClient.CreateIndividualAccountAsync(
-                XMindsApiIndividualAccountEmail, XMindsApiIndividualAccountPassword, 
+                XMindsApiIndividualAccountEmail, XMindsApiIndividualAccountPassword,
                 Role.Manager, "John", "Doe");
 
             await apiClient.ResendVerificationCodeAsync(XMindsApiIndividualAccountEmail);
 
             try
             {
-                await apiClient.VerifyAsync(XMindsApiIndividualAccountEmail, 
+                await apiClient.VerifyAsync(XMindsApiIndividualAccountEmail,
                     // Invalid verification code.
                     "00000000");
             }
@@ -100,7 +98,7 @@ namespace XMinds.Example
 
             var listAllUserPropertiesResult = await apiClient.ListAllUserPropertiesAsync();
 
-            var user1 = new User(new Dictionary<string, object> 
+            var user1 = new User(new Dictionary<string, object>
             {
                 { User.UserIdPropName, 1 },
                 { AgeUserProp, 25 },
@@ -186,7 +184,7 @@ namespace XMinds.Example
             {
                 new ItemRating(item1.ItemId, 3, DateTime.Now),
                 new ItemRating(item2.ItemId, 4, DateTime.Now),
-            }); 
+            });
 
             var listAllRatingsBulk2 = await apiClient.ListAllRatingsBulkAsync();
 
