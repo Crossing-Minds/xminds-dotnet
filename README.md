@@ -24,15 +24,15 @@ We developed some useful and efficient tools for general Machine Learning and op
 
 # .NET Library
 
-[![NuGet]](https://www.nuget.org/packages/XMinds/)
+Install XMinds .NET Library from NuGet: [NuGet Reference](https://www.nuget.org/packages/XMinds/)
 
-The official Crossing Minds .NET library, supporting .NET Standard 1.1+, .NET Core 1.0+, and .NET Framework 4.5+.
+The official XMinds .NET library supports .NET Standard 1.1+, .NET Core 1.0+, and .NET Framework 4.5+.
 
 # Development
 
 To build XMinds library from sources:
 
-Open XMinds.sln with Visual Studio.
-In Solution Explorer in Visual Sudio build XMinds project.
-Navigate to src\XMinds\bin\Release or src\XMinds\bin\Debug folder (depending on build configuration) and find created XMinds.*.*.*.nupkg.
-Use created XMinds nupkg in your porject.
+1. Open XMinds.sln with Visual Studio.
+2. In Solution Explorer in Visual Sudio build XMinds project.
+3. Navigate to src\XMinds\bin\Release or src\XMinds\bin\Debug folder (depending on build configuration) and find created XMinds.\*.\*.\*.nupkg.
+4. Use created XMinds nupkg in your porject.
