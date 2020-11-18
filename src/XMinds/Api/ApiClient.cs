@@ -61,7 +61,7 @@ namespace XMinds.Api
         }
 
         public async Task<TResponseModel> SendRequestAsync<TResponseModel>(HttpMethod httpMethod, string path,
-             Dictionary<string, object> queryParams = null,
+            Dictionary<string, object> queryParams = null,
             Dictionary<string, object> bodyParams = null, 
             CancellationToken cancellationToken = default)
         {
@@ -73,10 +73,10 @@ namespace XMinds.Api
                 var queryParamsBuilder = new StringBuilder(1000);
                 foreach(var queryParam in queryParams)
                 {
-                    // queryParam is IEnumerable, that means we should pass array of the values for the same key.
-                    if (queryParam.Value is System.Collections.IEnumerable enumerableValues)
+                    // if queryParam is ICollection, that means we should pass array of the values for the same key.
+                    if (queryParam.Value is System.Collections.ICollection collectionValues)
                     {
-                        foreach(object value in enumerableValues)
+                        foreach(object value in collectionValues)
                         {
                             if (queryParamsBuilder.Length != 0)
                             {

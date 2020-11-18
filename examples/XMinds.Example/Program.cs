@@ -57,9 +57,6 @@ namespace XMinds.Example
 
             await apiClient.ResendVerificationCodeAsync(XMindsApiIndividualAccountEmail);
 
-            // The delay just to give enough time to server to generate and send verification code.
-            await Task.Delay(30000);
-
             try
             {
                 await apiClient.VerifyAsync(XMindsApiIndividualAccountEmail, 
