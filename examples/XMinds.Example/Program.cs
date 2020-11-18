@@ -26,7 +26,7 @@ namespace XMinds.Example
 
         const string XMindsApiIndividualAccountEmail = "your_individual_account_email";
         const string XMindsApiIndividualAccountPassword = "your_individual_account_password";
-        
+
         const string XMindsApiServiceAccountName = "your_service_account_name";
         const string XMindsApiServiceAccountPassword = "your_service_account_password";
 
