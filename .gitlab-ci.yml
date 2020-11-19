@@ -1,0 +1,13 @@
+stages:
+  - build
+
+
+# On all branches, try to build
+build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/core/sdk:3.1
+  script:
+    - dotnet clean
+    - dotnet build
+  tags:
+    - open-source-unit-test
