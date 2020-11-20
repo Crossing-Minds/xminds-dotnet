@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -59,7 +60,7 @@ namespace XMinds
             {
                 foreach(var dataItem in apiError?.ErrorData)
                 {
-                    this.Data.Add(dataItem.Key, dataItem.Value?.ToString());
+                    this.Data.Add(dataItem.Key, Convert.ToString(dataItem.Value, CultureInfo.InvariantCulture));
                 }
 
                 if (apiError.ErrorData.TryGetValue("retry_after", out object retryAfter) && retryAfter != null)

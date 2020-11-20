@@ -235,7 +235,7 @@ namespace XMinds.Example
             await apiClient.TriggerBackgroundTaskAsync(BackgroundTaskName.MlModelRetrain);
 
             // Just required to wait while training task completes to be able to continue the example.
-            await Task.Delay(30000);
+            await Task.Delay(40000);
 
             var listRecentBackgroundTasks = await apiClient.ListRecentBackgroundTasksAsync(BackgroundTaskName.MlModelRetrain);
 

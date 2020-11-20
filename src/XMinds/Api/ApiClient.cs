@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Globalization;
 
 namespace XMinds.Api
 {
@@ -83,7 +84,7 @@ namespace XMinds.Api
                                 queryParamsBuilder.Append("&");
                             }
 
-                            queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(value.ToString())}");
+                            queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(Convert.ToString(value, CultureInfo.InvariantCulture))}");
                         }
                     }
                     else
@@ -93,7 +94,8 @@ namespace XMinds.Api
                             queryParamsBuilder.Append("&");
                         }
 
-                        queryParamsBuilder.Append($"{queryParam.Key}={Uri.EscapeDataString(queryParam.Value.ToString())}");
+                        queryParamsBuilder.Append(
+                            $"{queryParam.Key}={Uri.EscapeDataString(Convert.ToString(queryParam.Value, CultureInfo.InvariantCulture))}");
                     }
                 }
 

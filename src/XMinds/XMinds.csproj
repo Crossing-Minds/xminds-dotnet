@@ -6,18 +6,30 @@
     <Product>Crossing Minds Data Science .NET Library</Product>
     <Copyright>© Copyright 2020, Crossing Minds</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.7</Version>
+    <Version>0.0.8</Version>
     <NeutralLanguage></NeutralLanguage>
     <Description>Recommendation and personalization are simple ways to increase sales by making product suggestions to customers based on historical behavior. This can be applied not only to e-commerce but also to music, gaming, events, articles and more.
-Crossing Minds is democratizing access to recent gains in artificial intelligence research by building the world’s best content recommendation platform.</Description>
+Crossing Minds is democratizing access to recent gains in artificial intelligence research by building the world’s best content recommendation platform.
+XMinds library is a .NET wrapper around Crossing Minds State-of-the-Art Recommendation API. The library supports .NET Standard 1.1+, .NET Core 1.0+, and .NET Framework 4.5+.</Description>
   </PropertyGroup>
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageProjectUrl>https://docs.api.crossingminds.com/</PackageProjectUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageIcon>CrossingMinds.png</PackageIcon>
+    <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Images\CrossingMinds.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
